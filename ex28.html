@@ -1,0 +1,62 @@
+<!-- example on grid
+  grid ==> this option used to display elements in rows & cols format (tabler)
+		Syn:	display:grid;
+				-> def is N-rowsX1col
+				-> def no space
+				-> ele(column) size based on width container/browser
+
+  grid-template-columns ==> used to specify no.of columns & width of columns
+		Syn:	  grid-template-columns:col1 col2 col3...;
+						col1/2/3 => auto auto
+											main cont size/no.of cols
+								 => 30%  35%  30%
+											main cont size*30/100
+								 => Xpx  Ypx  
+  grid-column-gap ==> used to provide space between columns only
+		Syn:	grid-column-gap:Npx;
+
+  grid-row-gap ==> used to provide space between rows only
+		Syn:	grid-row-gap:Npx;
+
+  grid-gap ==> used to provide space between rows & columns
+		Syn:	grid-gap:Npx;
+
+Note: grid option should be applyed on main/container level tags
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	<title>Ex26</title>
+	<link rel="icon" href="logo1.png"/>
+	<style>
+	  span{
+		font-size:30px;
+	  }
+	</style>
+  </head>
+  <body>
+	 <h3>demo on grid</h3>
+	 <!-- main container -->			
+     <div style="display:grid; grid-template-columns:auto auto auto; grid-gap:30px  50px;  color:white;font-size:26px;">
+			<!-- or grid-row-gap:30px; grid-column-gap:50px; -->
+		<!-- content -->
+		<div style="background:#ff0000;">January</div>
+		<div style="background:#006600;">February</div>
+		<div style="background:#ff00cc;">March</div>
+		<div style="background:#3300ff;">April</div>
+		<div style="background:#ff0000;">May</div>
+		<div style="background:#006600;">June</div>
+		<div style="background:#ff00cc;">July</div>
+		<div style="background:#3300ff;">August</div>
+		<div style="background:#ff0000;">September</div>
+		<div style="background:#006600;">October</div>
+		<div style="background:#ff00cc;">November</div>
+		<div style="background:#3300ff;">December</div>
+  	 </div>
+ 
+  </body>	
+</html>
+
+
+
+

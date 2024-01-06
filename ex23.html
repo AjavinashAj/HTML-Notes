@@ -1,0 +1,45 @@
+<!-- example on css list
+list-style-type ==> used to specify type of list (for both ol & ul)
+	Syn:  list-style-type:decimal/upper-alpha/lower-alpha/lower-roman/upper-roman/disc/circle/square/lower-greek/leading-zero-decimal/none;
+
+list-style-image ==> used to images as a bullet 0style
+	Syn:	list-style-image:url(filename);
+-->
+<!-- example on list tags -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	<title>Ex23</title>
+	<link rel="icon" href="logo1.png"/>
+	<style>
+		ol{
+			list-style-type:lower-greek;
+		}
+	</style>
+  </head>
+  <body>
+	<ol>
+		<li>HTML</li> <li>CSS</li> <li>JavaScript</li> <li>BootStrap</li>
+	</ol>
+
+	<ul style="list-style-image:url(images/b.webp);">
+		<li>Google</li> <li>Microsoft</li> <li>Oracle</li> <li>Apple</li>
+		<li>Intel</li>
+	</ul>
+	<hr>
+
+	<ul>
+		<li style="list-style-image:url(images/b1.png);">Google</li> 
+		<li style="list-style-image:url(images/ms.png);">Microsoft</li> 
+		<li style="list-style-image:url(images/or.png);">Oracle</li> 
+		<li style="list-style-image:url(images/ap.png);">Apple</li>
+		<li style="list-style-image:url(images/in.png);">Intel</li>
+	</ul>
+
+  </body>	
+</html>			  
+
+
+
+
+

@@ -1,0 +1,98 @@
+<!-- example on css tables -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	<title>Ex41</title>
+	<link rel="icon" href="logo1.png"/>
+	<style>
+	  img{
+		width:20px;
+		height:20px;
+	  }
+	  caption{
+		color:#3300ff;
+		text-align:left;
+	  }
+	  table{
+		width:80%;
+		font-size:16px;
+		font-weight:bold;
+		border-collapse:collapse;		
+		box-shadow:1px 1px 2px 2px #ff00ff;
+	  }
+	  tr:nth-child(even){
+		background:#3300ff;
+		color:white;
+	  }
+	  tr:nth-child(odd){
+		background:#ff0033;
+		color:white;
+	  }
+	  tr:first-child{
+		background:#ffff00;
+		color:#3300cc;
+		font-size:18px;
+	  }
+	  tr:hover{
+		background:black;
+		color:#ccff00;
+	  }
+	  span{
+		display:inline-block;
+		width:20px;
+		height:20px;
+		color:black;
+		text-align:center;
+	  }
+	  .w{
+		background:#00ff00;
+	  }
+	  .l {
+		background:#ff9900;
+	  }
+	</style>
+  </head>
+  <body>
+ 	<table align="center">
+	  <caption>IPL 2022 Points Table</caption>
+	  <tr>
+		<th>POS</th> <th>TEAM</th> <th>MATCHES</th> <th>WON</th> <th>LOST</th> <th>PTS</th> <th>NRR</th> <th>Form</th>
+	  </tr>
+	  <tr>
+		<td>1</td> <td><img src="images/gt.png"/>Titans</td> <td>14</td> <td>10</td> <td>4</td> <td>20</td> <td>+0.316</td> 
+		<td> <span class="l">L</span> <span class="w">W</span> <span class="w">W</span> <span class="w">W</span> </td>
+	  </tr>
+	  <tr>
+		<td>2</td> <td><img src="images/rr.png"/>Royals</td> <td>14</td> <td>9</td> <td>5</td> <td>18</td> <td>+0.298</td>
+	  </tr>
+	  <tr>
+		<td>3</td> <td><img src="images/lsg.png"/>Super Giants</td> <td>14</td> <td>9</td> <td>5</td> <td>18</td> <td>+0.251</td>
+	  </tr>
+	  <tr>
+		<td>4</td> <td><img src="images/rcb.png"/>Royal Challengers</td> <td>14</td> <td>8</td> <td>6</td> <td>16</td> <td>-0.253</td>
+	  </tr>
+	  <tr>
+		<td>5</td> <td><img src="images/dc.png"/>Capitals</td> <td>14</td> <td>7</td> <td>7</td> <td>14</td> <td>+0.204</td>
+	  </tr>
+	  <tr>
+		<td>6</td> <td><img src="images/pbks.png"/>Kings</td> <td>14</td> <td>7</td> <td>7</td> <td>14</td> <td>+0.126</td>
+	  </tr>
+	  <tr>
+		<td>7</td> <td><img src="images/kkr.png"/>Knight Riders</td> <td>14</td> <td>6</td> <td>8</td> <td>12</td> <td>+0.146</td>
+	  </tr>
+	  <tr>
+		<td>8</td> <td><img src="images/srh.png"/>Sunrisers</td> <td>14</td> <td>6</td> <td>8</td> <td>12</td> <td>-0.379</td>
+	  </tr>
+	  <tr>
+		<td>9</td> <td><img src="images/csk.png"/>Super Kings</td> <td>14</td> <td>4</td> <td>10</td> <td>8</td> <td>-0.203</td>
+	  </tr>
+	  <tr>
+		<td>10</td> <td><img src="images/mi.png"/>Indians</td> <td>14</td> <td>4</td> <td>10</td> <td>8</td> <td>-0.506</td>
+	  </tr>
+	</table>
+  </body>	
+</html>
+
+
+
+

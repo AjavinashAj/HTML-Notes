@@ -1,0 +1,39 @@
+<!-- example on mark, base & bdi tags -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	<title>Ex59</title>
+	<link rel="icon" href="aj1.png"/>
+	<base width="400px"height="200px"title="photo"href="e:/html/image/"/>
+	
+  </head>
+  <body>
+	<p>EDITPLUS IS SOLD "AS IS" AND <mark>WITHOUT ANY WARRANTY</mark> AS TO MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE OR ANY OTHER WARRANTIES EITHER EXPRESSED OR IMPLIED. THE <mark>AUTHOR WILL NOT BE LIABLE</mark> FOR DATA LOSS, DAMAGES, LOSS OF PROFITS OR ANY OTHER KIND OF LOSS WHILE USING OR MISUSING THIS SOFTWARE.</p>
+	<bdi>apples</bdi>	<bdi>selppa</bdi>
+	<br>
+			200+
+	<img src="ak.png"width="400px"height="200px"title="photo"/>
+	<img src="ak1.png"/>
+	<img src="pic1.png"width="400px"height="200px"title="photo"/>
+	<img src="pic2.png"/>
+    <img src="pic13.png"/>
+	<img src="pic4.png"/>
+	<img src="pic5.png"/>
+	<img src="pic6.png"/>
+	<img src="tulip.png"/>
+	<img src="tulip1.png"/>
+	<img src="tulip2.png"/>
+	<img src="tulip3.png"/>
+	<img src="tulip4.png"/>
+	<img src="tulip5.png"/>
+	<img src="tulip6.png"/>
+  </body>	
+</html>
+
+
+
+
+
+ 
+ 
+ 

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Arithmetic operation result show on different platform</h1>
+    <label for=" ">Enter First Number</label>
+    <input type="text" name="firstNum" id="firstNum" /><br>
+    <label for=" ">Enter Second Number</label>
+    <input type="text" name="secondNum" id="secondNum" /><br>
+    <!-- result show on new web page -->
+    <button onclick="document.write(parseInt(firstNum.value)+parseInt(secondNum.value))">Add1</button>
+    <!-- result show on at alert box window -->
+    <button onclick="alert(parseInt(firstNum.value)+parseInt(secondNum.value))">Add2</button>
+    <!-- result show on same page -->
+    <button onclick="result.value=parseInt(firstNum.value)+parseInt(secondNum.value)">Add3</button>
+    <output id="result"></output>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Demo on variable</h1>
+    <script>
+        var a=100;
+        var b=100;
+        document.write(a ,b);
+        a=300;b=300
+        document.write(a,b);
+
+        let c =100;
+        let d =100;
+        document.write(c,d);
+        c=200;d=200;
+        document.write(c,d);// note reassignment are possible in var as well as let also.
+
+        const PI=3.14;
+        const EXP=2.714;
+        document.write(PI,EXP);
+        PI=3;
+        EXP=6;
+        document.write(PI,EXP);//it will give error,please check in inspection;
+                              //js6.html:26  Uncaught TypeError: Assignment to constant variable
+    </script>
+</body>
+</html>

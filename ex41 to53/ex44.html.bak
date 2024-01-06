@@ -1,0 +1,21 @@
+<!-- example on "input" tag -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	<title>Ex44</title>
+	<link rel="icon" href="logo1.png"/>
+  </head>
+  <body>
+	<h3>demo on password field</h3>
+	<label>enter password</label> <br>
+	<input type="password" id="pw" name="pw"minlength="5"maxlength="10"/>  <bR>
+ 	<label>enter cvv</label> <br>
+	<input type="password" id="cvv" name="cvv"/>  <bR>
+	<label>enter pin</label> <br>
+	<input type="password" id="pin" name="pin"/>  <bR>
+  </body>	
+</html>
+
+
+ 
+

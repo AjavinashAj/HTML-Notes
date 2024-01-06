@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        div{
+            background-color: blueviolet;
+            width: 300px;
+            height: 400px;
+            padding: 50px;
+            margin: auto;
+            text-align: center;
+            
+        }
+        
+    </style>
+</head>
+<body>
+    <div >
+    <h1>Mark sheet</h1>
+    <table align="center" >
+        <tr>
+            <td>Name</td>
+            <td><input type="text" name="name" id="name"></td>
+        </tr>
+        <tr>
+            <td>RollNo</td>
+            <td><input type="text" name="rolno" id="rolno"></td>
+        </tr>
+        <tr>
+            <td>HTML</td>
+            <td><input type="number" name="hm" id="hm"></td>
+        </tr>
+        <tr>
+            <td>CSS</td>
+            <td><input type="number" name="cm" id="cm"></td>
+        </tr>
+        <tr>
+            <td>Java script</td>
+            <td><input type="text" name="jm" id="jm"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><button onclick="calculate()">calculate</button></td>
+        </tr>
+        <tr>
+            <td></td><td><output id="total"></output><br><output id="average"></output></td>
+        </tr>
+    
+    </table>
+</div>
+<script>
+    function calculate(){
+        let h,c,j,tot,avg;
+        h=+hm.value;
+        c=+cm.value;
+        j=+jm.value;
+        tot=h+c+j;
+        avg=tot/3;
+        total.value="Total Marks: "+tot;
+        average.value="Average Marks: "+avg;
+        
+    } 
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!-- example on "select" & "option" tags -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	<title>Ex56</title>
+	<link rel="icon" href="logo1.png"/>
+  </head>
+  <body>
+	<h3>demo on dropdown control</h3>
+	<label>Mode of Training</label>
+	<select id="mot" name="mot">
+		<option value="">Select Training Type</option>
+		<option value="classroom"placeholder="classroom">Classroom Training</option>
+		<option value="online">Online Training</option>
+		<option value="project">Project Training</option>
+		<option value="placement" selected>Placement Training</option>
+		<option value="internship">Internship</option>
+		<option value="weekend">Weekend Training</option>
+	</select>
+
+	<label>Course</label>
+	<select id="course" name="course">
+		<option value="">Select Course</option>
+		<option value="c">C</option>
+		<option value="cpp">C++</option>
+		<option value="cj">Corejava</option>
+		<option value="aj">AdvJava</option>
+		<option value="fsj">Full Stack Java</option>
+		<option value="spring">Spring</option>
+		<option value="asp">ASP.net</option>
+		<option value="c#">C#.net</option>
+		<option value="fsn">Full Stack .Net</option>
+		<option value="python">Python</option>
+		<option value="dj">Django</option>
+		<option value="html-js" selected>Html-JavaScript</option>
+		<option value="angular">Angular</option>
+		<option value="react">React</option>
+		<option value="node">NodeJS</option>
+		<option value="php">PHP</option>
+		<option value="xml-ws">XML/WebServices</option>
+		<option value="oracle">Oracle</option>
+		<option value="mysql">MySQL</option>
+		<option value="sql-server">SQL-Server</option>
+		<option value="db2">DB/2</option>
+		<option value="tera">Teradata</option>
+	</select>
+
+  </body>	
+</html>
+
+
+
+
+
+ 
+ 
+ 

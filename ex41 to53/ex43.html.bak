@@ -1,0 +1,41 @@
+<!-- example on "input" tag
+input tag ==> used to create input elements or fields or controls
+		  ==> input elements are used to accept data from user
+		  ==> unpaired & inline tag
+		  ==> lacks & 1 line only
+		Syn:  <input type=" " .../>
+type => text, password, number, hidden, reset, submit, image, checkbox, radio,
+		email, url, date, time, file,...
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	<title>Ex43</title>
+	<link rel="icon" href="logo1.png"/>
+  </head>
+  <body>
+	<h3>demo on text fields</h3>
+	<!-- <input/>  -->
+	<input type="text" autofocus/>
+	<input type="text" maxlength="10"/>
+	<br>
+	<input type="text" size="3"/>
+	<br>
+	<input type="text" id="tb1" name="tf1"min="3"max="10"/>
+	<br>
+	<input type="text" id="tb2" name="tf2" placeholder="enter firstname"/>
+	<br>
+	<label>enter lastname</label>
+	<input type="text" id="tb3" name="tf3"/>
+	<br>
+	<input type="text" id="aa" name="aa" value="124"/>
+	<br>
+	<input type="text" id="bb" name="bb" value="apple" readonly/>
+	<br>
+	<input type="text" id="cc" name="c" required/>
+  </body>	
+</html>
+
+
+ 
+

@@ -1,0 +1,44 @@
+<!-- example inline & block options
+	inline ==> css option, used to display block level tags like as inline (side-by-side)
+		Syn:	display:inline;
+
+	block ==> css option, used to display inline tags like as block level tags (line-by-line)
+		Syn:	display:block;
+	
+	none ==> css option, used to hide tags
+		Syn:	display:none;
+				hidden:true;
+ -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	<title>Ex37</title>
+	<link rel="icon" href="logo1.png"/>
+  </head>
+  <body>
+	<img src="images/b1.png"/>
+	<!-- block ==> inline -->
+	<h1 style="background:cyan; display:inline;">Google</h1>
+	<h1 style="background:pink; display:inline;">Microsoft</h1>
+	<h2 style="background:yellow; display:inline;">Oracle</h2>      
+	<hr>
+	<!-- inline  ==> block -->
+	<label style="background:cyan; display:block;">Google</label>
+	<label style="background:pink; display:block;">Microsoft</label>
+	<label style="background:yellow; display:block;">Oracle</label>  
+	<hr>
+	<input type="radio" name="r" onchange="document.getElementById('d').style.display='block'"/>Show &nbsp;&nbsp;
+	<input type="radio" name="r" onchange="document.getElementById('d').style.display='none'"/>Hide&nbsp;&nbsp;
+	<br>
+
+	<div style="display:none;" id="d">
+		<h1>Google</h1>
+		<h1>Microsoft</h1>
+		<h2>Oracle</h2>    
+	</div>
+  </body>	
+</html>
+
+
+
+

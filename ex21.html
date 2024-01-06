@@ -1,0 +1,79 @@
+<!--
+html list tags
+	> ol
+	> ul
+
+ol ==> ordered list
+   ==> used to display data in points format with numbering
+		numbering styles: 1,2,3,....	(default)
+						  A,B,C,....
+						  a,b,c,....
+						  i,ii,iii,....
+						  I,II,III,....
+   ==> paired tag & block level
+   ==> ol is parent of li tag
+
+li ==> list item
+   ==> used to print data 
+   ==> paired tag & block level
+   ==> li is chils of ol tag
+Syn:-		<ol>
+				<li>data</li>
+				<li>data</li>
+				...
+			</ol>
+-->
+<!-- example on list tags -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	<title>Ex21</title>
+	<link rel="icon" href="logo1.png"/>
+  </head>
+  <body>
+	<h3>demo on Ordered List</h3>
+	<h4>How do I make a payment using Flipkart's credit card EMI option?</h4>
+	<ol>
+	  <li>Choose your credit-card issuing bank you wish to pay from</li>
+	  <li>Select the EMI plan of your preference</li>
+	  <li>Enter your credit card details</li>
+	  <li>Click 'Save and Pay'</li>
+	</ol>
+	<hr> <!-- it draws a line horizontally (left to right edge) -->
+
+	<h4>Following products shall not be eligible for return or replacement:</h4>
+	<ol type="A" start="52" reversed>	 
+		<!-- type="1"  or   type="A" or type="a"  or type="i" or  type="I" -->
+	  <li>Damages due to misuse of product;</li>
+	  <li>Incidental damage due to malfunctioning of product;</li>
+	  <li>Any consumable item which has been used/installed;</li>
+	  <li>Products with tampered or missing serial/UPC numbers;</li>
+	  <li>Digital products/services (Flyte music downloads)</li>
+	  <li>Jewellery which is 'made to order' on customer's reques</LI>
+	</ol>
+	<hr>
+	<ol style="color:#ff0066;">	<!-- main list -->
+		<li>Tata Cars</li>
+			<ol type="i" style="color:#0000ff;">	<!-- sub list -->
+				<li>Tata Nexon &#8377;7.59 Lakh <img src="a.jpg"/></li>
+				<li>Tata Punch &#8377;5.83 Lakh</li>
+				<li>Tata Altroz0 &#8377;6.29 Lakh</li>
+				<li>Tata Harrier &#8377;14.69 Lakh</li>				
+			</ol>
+		<li>Hyundai Cars</li>
+			<ol type="i" style="color:#0000ff;">	<!-- sub list -->
+				<li>Hyundai Tucson &#8377;26.00 Lakh</li>
+				<li>Hyundai Venue &#8377;7.53 Lakh</li>
+				<li>Hyundai Creta &#8377;10.44 Lakh</li>
+				<li>Hyundai Grand &#8377;i10 Nios 5.39 Lakh</li>
+				<li>Hyundai i20 &#8377;7.03 Lakh</li>					
+			</ol>
+	</ol>
+
+  </body>	
+</html>			  
+
+
+
+
+

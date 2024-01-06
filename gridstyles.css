@@ -1,0 +1,24 @@
+/* creating external styles for grid application (gridstyles.css) */
+#span-id{
+	font-size:34px;
+}
+img{
+	width:50px;
+	height:50px;
+}
+#main-container{
+	width:80%;
+	margin:auto;
+	background:cyan;
+}
+#sub-container2{
+	text-align:center;
+	display:grid;
+	grid-template-columns:auto auto auto;
+	grid-gap:20px;
+}
+.content{
+	background:yellow;
+	border-radius:10px;
+}
+

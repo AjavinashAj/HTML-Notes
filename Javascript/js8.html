@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Demo on var and let</h1>
+    <script>
+        var a=100;
+        document.write('a:'+a,typeof(a) ,'<br>');
+        var a="apple";// redefinition
+        document.write('a:'+a,typeof(a),'<br>');
+        // let a=false;//error
+        document.write('a:'+a,typeof(a),'<br>');
+        b=100;
+        document.write('b:'+b,typeof(b),'<br>');
+        // let b;// error,cant access before initialization
+        var b;//hosting
+        c='rama';
+        document.write('c:'+c,typeof(c));
+        var c; //hosting
+    </script>
+</body>
+</html>

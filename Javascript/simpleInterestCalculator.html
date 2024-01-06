@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+          div{
+
+            background-color: aqua;
+            margin: auto;
+            width: 300px;
+            height: 280px;
+            padding: 50px;
+          }
+    </style>
+</head>
+<body>
+    <div>
+    <h3>Simple Interest Calculator</h3>
+    <label for="">Principle Amount:</label><br>
+    <input type="text" id="pamt" name="pamt"/><span>&#8377</span><br>
+    <label for="">Rate of Interest:</label><br>
+    <input type="text" id="rate" name="rate"/><span>%</span><br>
+    <label for="">Time:</label><br>
+    <input type="text" id="tim" name="tim"/><span>year(s)</span><br>
+    <button onclick="compute()">Calculate</button>
+   <output id="result"></output>
+   </div>
+
+   <script>
+      function compute() {
+
+        let p,r,si,t;
+       p=pamt.value;
+       r=rate.value;
+       t=tim.value;
+
+       si=p*r*t/100;
+      // result.value="simple interest: " + si;
+       result.innerHTML="simple interest:&#8377 " + si;
+      }
+   </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Arithmetic Calculator</h1>
+    <label for="">Enter First Number</label>
+    <input type="text" name="firstNum" id="firstNum" value=""/><br>
+    <label for="">Enter First Number</label>
+    <!-- For addition parseInt required otherwise  concatination process happen  -->
+    <input type="text" name="secondNum" id="secondNum" value=""/><br>
+    <button onclick="result.value=parseInt(firstNum.value)+parseInt(secondNum.value)">Add</button>
+    
+    <!-- for other than add operation parseInt not required because internally it convert into number -->
+    <button onclick="result.value=firstNum.value-secondNum.value">Sub</button>
+    
+    <!-- for multiplication -->
+    <button onclick="result.value=firstNum.value*secondNum.value">Mul</button>
+    
+    <!-- for division -->
+    <button onclick="result.value=firstNum.value/secondNum.value">Div</button>
+
+    <!-- for modulus -->
+    <button onclick="result.value=firstNum.value%secondNum.value">Mod</button><br><br>
+    <output id="result"></output>
+</body>
+</html>

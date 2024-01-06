@@ -1,0 +1,4521 @@
+27-jun-22
+
+SPECIAL FUNCTIONS :- 
+--------------------
+
+NVL() :-
+--------
+
+=> used to convert null values 
+
+         NVL(arg1,arg2)
+  
+    if arg1=null returns arg2
+    if arg1<>null returns arg1 only
+ 
+  NVL(100,200)    => 100
+  NVL(NULL,200)   => 200
+
+ display ename   sal  comm  totsal  ?
+
+     totsal = sal + comm 
+
+  SELECT ename,sal,comm,sal+comm as totsal
+  FROM emp ;
+
+   smith  800   null   null
+   allen  1600  300    1900
+
+  SELECT ename,sal,comm,sal+NVL(comm,0) as totsal
+  FROM emp;
+
+   smith   800   null  800
+   allen   1600  300   1900
+
+ display  ename  sal  comm ?
+                      
+   if comm = null display N/A ?
+
+ SELECT ename,sal,NVL(TO_char(comm),'N/A') as comm
+ FROM emp ; 
+
+   smith  800   N/A
+   allen  1600  300
+  
+ ASCII() :-  returns ascii value
+ --------
+ 
+     ASCII('A')  => 65
+
+ CHR() :-  returns character for given ascii value
+ --------
+     
+     CHR(65) => A 
+ 
+ SELECT 'A'||'B' FROM DUAL ; =>  AB
+
+ SELECT 'A'||CHR(10)||'B' FROM DUAL ; =>
+
+ scenario :- 
+ ----------
+
+ cust
+ cid  name   hno  street  city  state  pin
+ 10   abc    100  ampt    hyd   ts     500036
+
+ output :- 
+
+  name  
+  hno
+  street
+  city
+  state-pin
+  
+ SELECT name||chr(10)||
+        hno||chr(10)|| 
+        street||chr(10)||
+        city||chr(10)||
+        state||'-'||pin
+ FROM cust
+ 
+=> display all ascii characters ?
+
+  0   ? 
+  1   ?
+  2  ?
+  
+  65  A
+
+  255 ?
+
+ SELECT LEVEL-1,CHR(LEVEL-1)
+ FROM DUAL
+ CONNECT BY LEVEL<=256 ;
+
+Analytical functions/window functions :- 
+----------------------------------------
+
+RANK & DENSE_RANK :- 
+--------------------
+
+=> used to find ranks
+=> ranking is always based on some column
+=> for rank functions data must be sorted.
+
+    rank() over (order by colname asc/desc)
+
+ => find the ranks of the employees based on
+    sal and highest paid should get 1st rank ?
+ 
+   SELECT ename,sal,
+          rank() over (order by sal desc) as rnk
+   FROM emp ; 
+ 
+   5000   1  
+   3000   2
+   3000   2
+   2975   4
+
+  SELECT ename,sal,
+       dense_rank() over (order by sal desc) as rnk
+  FROM emp ;
+
+   5000   1  
+   3000   2
+   3000   2
+   2975   3
+
+   diff b/w rank & dense_rank ?
+
+  1 rank function generates gaps but 
+    dense_rank will not generate gaps 
+
+  2 in rank function ranks may not be in sequence
+    but in dense_rank ranks will be always in
+    sequence.
+
+   sal		rnk		drnk
+   5000		1		1				
+   4000 	2		2
+   3000		3		3
+   3000		3		3
+   3000		3		3
+   2000		6		4
+   2000		6		4
+   1000		8		5	
+	
+ PARTITION BY clause :- 
+ ----------------------
+
+ =>  used to find ranks with in group  for example   
+     to find ranks with in dept first we need
+     to divide the table dept wise and apply 
+     dense_rank function with  in dept 
+ 
+   sql>break on deptno skip 1 
+   sql>SELECT deptno,ename,sal,
+           dense_rank() over (partition by deptno
+                              order by sal desc)
+                as rnk
+    FROM emp ;
+
+ ROW_NUMBER() :- 
+ ---------------
+
+ => return record numbers
+
+  SELECT  ename,sal,
+          row_number() over (order by sal desc)
+             as rno
+  FROM emp ; 
+           
+ sal		rnk		drnk	rno
+ 5000		1		1	1
+ 4000		2		2	2
+ 3000		3		3	3
+ 3000		3		3	4
+ 3000		3		3	5
+ 2000		6		4	6
+ 2000		6		4	7
+ 1000		8		5	8
+
+ 28-jun-22
+
+ Aggregate Functions / Group Functions :- 
+ ----------------------------------------
+
+ => these functions process group of values   
+    and returns one value.
+
+  MAX() :- 
+  --------
+   
+ => returns maximum value
+
+    MAX(arg)
+
+   SELECT MAX(sal) FROM emp ;  =>  5000
+ 
+   SELECT MAX(hiredate) FROM emp ; => 12-jan-83
+
+   SELECT MAX(ename) FROM emp ; => ward
+ 
+ MIN() :- 
+ --------
+
+ => returns minimum value
+
+    MIN(arg)
+
+  SELECT MIN(sal) FROM emp ; => 800
+
+ SUM() :- 
+ -------
+
+ => returns total 
+
+   SUM(arg) 
+
+   SELECT SUM(sal) FROM emp ;  => 29025
+ 
+  => round the total sal to nearest hundreds ?
+ 
+      SELECT ROUND(SUM(sal),-2) FROM emp; 29000
+
+    29000---------29050-----------29100
+ 
+ => after rounding display total sal with   
+    currency symbold and thousand seperator ?
+      
+     SELECT
+     TO_CHAR(ROUND(SUM(sal),-2),'L99,999')
+     FROM EMP ; 
+
+   student
+   sno   sname   m   p  c
+   1     A       80  90 70
+   2     B       60  50 70
+
+  display total marks ?
+
+  SELECT sno,sname,m+p+c as total FROM student ;
+
+ AVG() :- 
+ -------
+
+ => returns average value
+
+    AVG(arg)
+
+  SELECT AVG(sal) FROM emp ; => 2073.21429
+
+  => round the total sal to lowest ? 
+
+    SELECT FLOOR(AVG(sal)) FROM emp; => 2073
+
+  NOTE :- both sum,avg cannot be applied on
+  date,char fields can be applied only on
+  numeric field.
+
+ COUNT(*) :- 
+ -----------
+
+ => returns no of rows in a table.
+
+  SELECT COUNT(*) FROM emp ; => 14
+
+ => how many employees joined in 1981 year ?
+ 
+   SELECT COUNT(*)   
+   FROM emp 
+   WHERE TO_CHAR(hiredate,'YYYY') = 1981;
+  
+ => how many employees joined on sunday ?
+
+   SELECT COUNT(*)
+   FROM emp 
+   WHERE TO_CHAR(hiredate,'dy')='sun' ;
+
+  => how many employees joined in 2nd quarter
+     of 1981 year ?
+ 
+     SELECT count(*)
+     FROM emp 
+     WHERE TO_CHAR(hiredate,'yyyy') = 1981
+           AND
+           TO_CHAR(hiredate,'q') = 2 ;
+
+ note :- aggregate functions are not allowed
+ in where clause and they are allowed in 
+ select,having clauses.
+
+ SELECT *
+ FROM emp
+ WHERE COUNT(*) = 6;  => error
+
+ SELECT *
+ FROM emp
+ WHERE sal = MAX(sal) ;  => error
+
+ string :- upper,lower,initcap,length,substr,
+           lpad,rpad,ltrim,rtrim,trim,replace,
+           translate,reverse
+
+ math :-  abs,power,sqrt,sign,mod,round,trunc,
+          ceil,floor
+
+ date  :-  add_months,months_between
+
+ conv :-  to_char,to_date,to_number
+
+ special :- nvl,ascii,chr
+
+ analytical :- rank,dense_rank,row_number
+
+ aggregate :- max,min,sum,avg,count(*)
+
+ T1
+ F1
+ 10
+ NULL
+ 20
+ NULL 
+ 30
+
+ SELECT COUNT(*) FROM T1 ; => 5
+
+ CASE statement :- 
+ -----------------
+
+ => similar to switch case 
+ => used to implement if-then-else in sql commands
+ => case statements are 2 types 
+
+  1  simple case
+  2  searched case
+
+ simple case :- 
+ --------------
+ => use simple case when conditions based on "="
+    operator.
+
+    case colname
+    when value1 then return expr1
+    when value2 then return expr2
+    -------------------
+    else return expr
+    end
+
+ searched case :- 
+ ----------------
+ => use searched case when conditions not based 
+    on "=" operator.
+
+  case  
+  when cond1 then return expr1
+  when cond2 then return expr2
+  ---------------
+  else return expr
+  end
+
+29-jun-22
+ 
+ examples :- 
+ -----------
+
+ => display  ename   job   ?
+                 
+              if job=CLERK display WORKER
+                     MANAGER       BOSS
+                     PRESIDENT     BIG BOSS 
+                     others        EMPLOYEE
+   SELECT ename,
+          CASE job
+          WHEN 'CLERK' THEN 'WORKER'
+          WHEN 'MANAGER' THEN 'BOSS'
+          WHEN 'PRESIDENT' THEN 'BIG BOSS'
+          ELSE 'EMPLOYEE'
+          END as job
+   FROM emp ;
+
+ => increment employee salaries as follows ?
+
+    if deptno=10 incr sal by 10%
+              20             15%
+              30             20%
+             others          5%
+  UPDATE emp
+  SET sal = case deptno
+            when 10 then  sal+(sal*0.1)
+            when 20 then  sal+(sal*0.15)
+            when 30 then  sal+(sal*0.2)
+            else sal+(sal*0.05)
+            end
+
+=> display ename  sal  salrange ?
+      
+                     if sal>3000 display Hisal
+                        sal<3000 display Losal
+                        otherwise        Avgsal
+  use :- searched case
+
+  SELECT ename,sal,
+         case  
+         when sal>3000 then 'Hisal'
+         when sal<3000 then 'Losal'
+         else 'Avgsal'
+         end as salrange
+ FROM emp ;
+
+ => 
+
+ student
+ sno  sname  s1   s2   s3
+ 1    A      80   90   70
+ 2    B      30   60   50
+
+ => display  sno  total  avg  result ?
+                              pass/fail
+   SELECT sno,
+          s1+s2+s3 as total,
+          (s1+s2+s3)/3 as avg,
+         case 
+         when  s1>=35 AND s2>=35 AND s3>=35 then 'pass'
+         else 'fail'
+         end as result  
+  FROM student ;
+
+  display  sno  total  avg  result ?
+                            distinction
+                            first
+                            second
+                            third
+                            fail
+  SELECT sno,
+          s1+s2+s3 as total,
+          (s1+s2+s3)/3 as avg,
+         case 
+         when  s1>=35 AND s2>=35 AND s3>=35 
+                AND (s1+s2+s3)/3>=70 then 'Distinction'
+         when s1>=35 AND s2>=35 AND s3>=35 
+                AND (s1+s2+s3)/3>=60 then 'first'
+         when s1>=35 AND s2>=35 AND s3>=35 
+                AND (s1+s2+s3)/3>=50 then 'second'
+         when s1>=35 AND s2>=35 AND s3>=35 
+                AND (s1+s2+s3)/3>=35 then 'third'
+          else 'fail'
+          end as result
+    from student ;
+
+===================================================
+
+30-jun-22
+
+GROUP BY clause :- 
+------------------
+ 
+=> GROUP BY clause is used to group rows based on
+   one or more columns to calculate min,max,sum,   
+   avg,count for each group.
+
+    EMP
+    empno  ename  sal  deptno
+    1      A      5000 10
+    2      B      3000 20                10   8000
+    3      C      4000 30  ==group by=>  20   7000
+    4      D      3000 10                30   4000
+    5      E      4000 20
+
+ syntax :- 
+ ---------
+
+ SELECT columns
+ FROM tabname
+ [WHERE cond]  
+ GROUP BY <col>
+ [HAVING cond]
+ [ORDER BY <col> asc/desc]
+
+ execution :- 
+ -----------
+
+ FROM
+ WHERE
+ GROUP BY
+ HAVING
+ SELECT
+ ORDER BY 
+
+=> display job wise no of employees ?
+
+   SELECT job,COUNT(*)
+   FROM emp 
+   GROUP BY job ;
+  
+   clerk  4
+   salesman 4  
+   manager  3
+   analyst  2
+   president 1
+
+FROM emp :-
+-----------
+
+   EMP
+    empno  ename  sal   job
+    1      A      5000  manager
+    2      B      3000  clerk    
+    3      C      4000  manager
+    4      D      3000  clerk
+    5      E      4000  clerk
+
+ GROUP BY job :- 
+ -------------
+
+  clerk
+           2      B      3000 
+           4      D      3000   
+           5      E      4000   
+  manager
+          1      A      5000   
+          3      C      4000   
+
+  SELECT job,COUNT(*) :-
+ -----------------------
+
+   	clerk   3
+        manager 2
+
+  => display dept wise total sal ?
+
+    SELECT deptno,sum(sal)  
+    FROM emp 
+    GROUP BY deptno ;
+
+    10  8750
+    20  10875
+    30  9400 
+
+ => display year wise no of employees joined ?
+
+   SELECT TO_CHAR(hiredate,'yyyy'),
+          COUNT(*)
+   FROM emp 
+   GROUP BY TO_CHAR(hiredate,'yyyy') ;
+
+ => in which dept more than 3 employees working ?
+
+   SELECT deptno,COUNT(*)
+   FROM emp    
+   WHERE COUNT(*)>3 
+   GROUP BY deptno ;  => ERROR
+
+ => oracle cannot calculate dept wise count
+    before group by and it can calculate only
+    after group by so apply the cond count(*)>3
+    after group by using HAVING clause.
+ 
+   SELECT deptno,COUNT(*)
+   FROM emp    
+   GROUP BY deptno 
+   HAVING COUNT(*)>3 ;
+
+ => display job wise no of employees for the
+    job = clerk,manager and no of employees > 3 ?
+
+    SELECT job,COUNT(*)
+    FROM emp 
+    WHERE job IN ('CLERK','MANAGER')
+    GROUP BY job 
+    HAVING COUNT(*)>3 ;
+
+  Question :- 
+  ---------- 
+
+ PERSONS
+ name   age   gender   addr   state  aadharno
+ 
+ => find southern states having more than 5cr
+    population ?
+
+   SELECT state,count(*) 
+   FROM persons
+   WHERE state IN ('AP','TS','KA','KL','TN')
+   GROUP BY state 
+   HAVING COUNT(*) > 50000000
+
+ 01-jul-22
+
+ WHERE VS HAVING :- 
+ ------------------
+
+          WHERE                         HAVING 	 
+   
+   1   used to select specific rows     used to select specific groups
+
+  2    conditions applied before        conditions applied
+       group by                          after group by
+
+  3    use where clause if cond         use having clause
+       doesn't contain aggregate        if cond contains
+       function                         aggregate function
+
+ => display dept wise and with in dept job wise total sal ?
+
+     SELECT deptno,job,SUM(sal)
+     FROM emp 
+     GROUP BY deptno,job
+     ORDER BY deptno ASC ; 
+
+  10   clerk    1300
+       manager  2450
+       pres     5000
+ 
+  20   analyst  6000
+       clerk    1900
+       manager  2975
+
+  30   clerk    950
+       manager  2850
+       salesman 5600
+ 
+ => display state wise and with in state gender wise population ?
+
+   PERSONS
+   name   age   gender   addr   state  aadharno
+ 
+   SELECT state,gender,COUNT(*)
+   FROM persons
+   GROUP BY state,gender 
+   ORDER BY state ASC ;
+
+    AP    MALE    ?
+          FEMALE  ?
+
+   AR    MALE    ?
+         FEMALE  ?
+   
+   AS     MALE    ?
+         FEMALE  ?
+  
+ ROLLUP & CUBE :- 
+ ----------------
+
+ => both functions are used to display subtotals and grand total
+         
+          GROUP BY ROLLUP(col1,col2)
+          GROUP BY CUBE(col1,col2)
+
+ ROLLUP :- 
+ ---------
+
+ => displays subtotals for each group and also displays grand total
+
+     SELECT deptno,job,SUM(sal)
+     FROM emp 
+     GROUP BY ROLLUP(deptno,job)
+     ORDER BY deptno ASC ; 
+
+     10   clerk    1300
+       	  manager  2450
+          pres     5000
+                   8750  => subtotal
+ 
+     20   analyst  6000
+          clerk    1900
+          manager  2975
+                   10875  => subtotal
+
+                 29025   => grand total
+
+ CUBE :- 
+ -------
+
+ => cube displays subtotals for each group by column (deptno,job)
+    and also displays grand total.
+
+     SELECT deptno,job,SUM(sal)
+     FROM emp 
+     GROUP BY CUBE(deptno,job)
+     ORDER BY deptno ASC ; 
+
+     10   clerk    1300
+       	  manager  2450
+          pres     5000
+                   8750  => dept subtotal
+ 
+     20   analyst  6000
+          clerk    1900
+          manager  2975
+                   10875  => dept subtotal
+
+          analyst   6000  => job subtotal
+          clerk     4150  => job subtotal
+
+                    29025  => grand total
+
+ => display state wise and gender wise population and also 
+    display state and gender wise subtotals ?
+
+    SELECT state,gender,COUNT(*)
+    FROM persons 
+    GROUP BY CUBE(state,gender) 
+    ORDER BY state ASC ; 
+
+    AP  MALE    ?
+        FEMALE  ?
+                ?
+   AR   MALE   ?
+        FEMALE ?
+               ?
+
+        MALE   ?
+        FEMALE ?
+               
+                ?
+
+ what is purpose of group by ?
+ how to write group by queries 
+ where vs having
+ rollup & cube
+
+==================================================================
+
+			JOINS 
+                        ------
+
+ => join is an operation performed to fetch data from two or
+    more tables. In db related data stored in multiple tables,
+    to combine data stored in multiple tables we need to join
+    those tables.
+
+ example :-    
+ 
+  orders                                  customers
+  ordid   ord_dt   del_dt  cid           cid   name   addr
+  1000    ??        ??      10            10    A      HYD
+  1001    ??        ??      11            11    B      HYD
+  1002                      12            12    C      HYD
+
+output :-
+
+ ordid   ord_dt   del_dt   cname   addr 
+ 1000     ??      ??       A       HYD
+ 1001                      B       HYD
+
+ Types of joins :- 
+ -----------------
+
+ 1 Equi Join / Inner Join
+ 2 Outer Join
+      Left Outer join
+      Right Outer Join
+      Full Outer Join
+ 3 Non Equi Join
+ 4 Self Join
+ 5 Cross Join / Cartesian Join
+
+ Equi / Inner Join :- 
+ -------------------
+
+ => To perform Equi Join between the two tables there must be
+    a common field and name of the common field need not to be
+    same and fk-pk relationship is not compulsory.
+
+    SELECT columns
+    FROM tab1 INNER JOIN tab2 
+      ON join condition ;
+
+  join conditioin :- 
+  -------------------
+
+  => based on the join condition oracle joins the records of
+     two tables.
+
+  => join condition determines which record of 1st table
+     joined with which record of 2nd table.
+
+         table1.commonfield = table2.commonfield
+
+ 02-jul-22
+
+  Example :- 
+
+   EMP           			DEPT
+   empno  ename  sal  deptno		DEPTNO	DNAME	  LOC
+   1	  A      5000 10  		10	ACCT      NY
+   2      B      3000 20		20	RESEARCH
+   3      C      4000 30		30	SALES
+   4      D      3000 10		40	OPERATIONS
+   5      E      2000 NULL
+
+ => display   ENAME  SAL   DNAME   LOC   ?
+              ----------   ------------
+                   EMP      DEPT
+  
+   SELECT ename,sal,dname,loc 
+    FROM  emp INNER JOIN dept  
+      ON  emp.deptno = dept.deptno ;
+  
+    A	5000	ACCT		???
+    B   3000	RESEARCH	???
+    C   4000	SALES		???
+    D   3000    ACCT            ???
+
+ => display  ENAME   DEPTNO  DNAME   ?
+
+  SELECT ename,deptno,dname
+    FROM  emp INNER JOIN dept  
+      ON  emp.deptno = dept.deptno ;  => error
+
+ NOTE :-  in joins declare table alias  and prefix column names
+ with table alias for two reasons 
+
+  1  to avoid ambiguity
+  2  for fater execution
+
+   SELECT e.ename,d.deptno,d.dname,d.loc as city
+    FROM  emp e INNER JOIN dept d
+      ON  e.deptno = d.deptno ;
+ 
+   => display employees working at NEW YORK loc ?
+ 
+     SELECT e.ename,d.dname,d.loc
+     FROM emp e INNER JOIN dept d
+       ON e.deptno=d.deptno   /* join cond */
+     WHERE d.loc='NEW YORK'   /* filter cond */  ;
+
+  OUTER JOIN :- 
+  -------------
+
+ => inner join returns only matching records but will not 
+    return unmatched records , to get unmatched records also
+    perform outer join.
+
+    EMP           			DEPT
+   empno  ename  sal  deptno		DEPTNO	DNAME	  LOC
+   1	  A      5000 10  		10	ACCT      NY
+   2      B      3000 20		20	RESEARCH
+   3      C      4000 30		30	SALES
+   4      D      3000 10		40	OPERATIONS => unmatched record
+   5      E      2000 NULL => unmatched record
+
+  => outer join is 3 types 
+
+   1 LEFT OUTER JOIN
+   2 RIGHT OUTER JOIN
+   3 FULL OUTER JOIN
+
+  LEFT OUTER JOIN :- 
+  ------------------
+
+  => returns all rows (matched + unmatched) from left side table    
+     and matching rows from right side table.
+
+    SELECT e.ename,d.dname
+     FROM emp e LEFT OUTER JOIN dept d
+       ON e.deptno = d.deptno ; 
+
+    	A	ACCT
+	B	RESEARCH
+	C	SALES
+	D	ACCT
+  	E	NULL   => unmatched record from emp 
+
+  04-jul-22
+
+  RIGHT OUTER JOIN :- 
+  -------------------
+
+ => returns all rows from right side table and matching rows 
+    from left side table.
+
+   SELECT e.ename,d.dname
+     FROM emp e RIGHT OUTER JOIN dept d
+       ON e.deptno = d.deptno ; 
+
+      A		ACCTS
+      B		RESEARCH
+      C		SALES
+      D		ACCT
+     NULL       OPERATIONS  => unmatched from dept 
+
+ FULL OUTER JOIN :- 
+ -------------------
+
+ => returns all rows from both tables 
+ 
+   SELECT e.ename,d.dname
+     FROM emp e FULL OUTER JOIN dept d
+       ON e.deptno = d.deptno ; 
+
+      A    ACCT
+      B    RESEARCH
+      C    SALES
+      D    ACCT
+      E    NULL      => unmatched from emp
+   NULL    OPERATIONS   => unmatched from dept
+
+ displaying only unmatched rows ?
+
+ left side table :- 
+ -----------------
+
+    SELECT e.ename,d.dname
+     FROM emp e LEFT OUTER JOIN dept d
+       ON e.deptno = d.deptno  
+     WHERE d.dname IS NULL ; 
+
+        E     NULL
+
+  right side table :- 
+  -------------------
+
+   SELECT e.ename,d.dname
+     FROM emp e RIGHT OUTER JOIN dept d
+       ON e.deptno = d.deptno  
+    WHERE e.ename IS NULL ; 
+
+     NULL   OPERATIOINS  
+
+  both tables :- 
+  -------------
+
+   SELECT e.ename,d.dname
+     FROM emp e FULL OUTER JOIN dept d
+       ON e.deptno = d.deptno  
+    WHERE d.dname IS NULL OR e.ename IS NULL  ;
+
+    E       NULL           => unmatched from emp
+    NULL    OPERATIONS     => unmatched from dept
+
+ scenario :- 
+ -----------
+
+ projects
+ projid   name   duration   cost  client
+ 100      ABC
+ 101      PQR
+ 102      KLM
+
+ emp
+ empid   ename   sal     projid   references projects(projid)
+ 1                       100
+ 2                       101  
+ 3                       null
+  
+ => display employee details with project details ?
+
+   SELECT e.*,p.*
+    FROM emp e INNER JOIN projects p
+      ON e.projid = p.projid ;
+
+=> display employee details with project details and also
+   display employees not assigned to any project ?
+
+    SELECT e.*,p.*
+     FROM emp e LEFT OUTER JOIN projects p
+       ON e.projid = p.projid ;
+
+ => display employee details with project details and
+    also display projects where no employee assigned to it ?
+ 
+    SELECT e.*,p.*
+     FROM emp e RIGHT OUTER JOIN projects p
+       ON e.projid = p.projid ;
+
+ Non Equi Join :- 
+ -----------------
+
+ => non equi join is performed between the tables not sharing
+    a common field 
+
+ => here join condition is not based on "=" operator and it
+    is based on  >   <   between operators.
+
+   EMP					SALGRADE
+   empno ename  sal 			grade	losal	hisal  
+   1	 A	3500			1	700	1000
+   2	 B	1000			2	1001	2000
+   3	 C	5000			3	2001	3000
+   4	 D	2500			4	3001	4000
+   5	 E	3000			5	4001	9999
+
+ => Display  ENAME   SAL   GRADE   ?
+             -----------   ------
+                 EMP       SALGRADE 
+    
+   SELECT e.ename,e.sal,s.grade
+    FROM  emp e JOIN salgrade s
+      ON  e.sal BETWEEN s.losal AND s.hisal ; 
+   
+    A		3500	4
+    B		1000	1
+    C		5000	5
+    D		2500	3
+    E		3000	3
+
+ => display grade 3 employee list ? 
+
+   SELECT e.ename,e.sal,s.grade
+    FROM  emp e JOIN salgrade s
+      ON  e.sal BETWEEN s.losal AND s.hisal   
+    WHERE s.grade = 3 ;
+
+ 05-jul-22
+ 
+  self join :- 
+  -------------
+
+ => joining a table to itself is called self join.
+
+ => in self join a record in one table joined with
+    another record of same table.
+    
+ => to perform self join the same table must be declared
+    two times with different alias in FROM clause.
+
+           FROM emp a INNER JOIN emp b
+
+          emp  a                 emp  b
+          empno ename  mgr        empno ename mgr
+           1    A     NULL	  1	A    NULL
+           2    B     1		  2	B    1
+           3    C     1           3     C    1
+           4    D     2           4     D    2
+           5    E     3           5     E    3
+
+    => above table contains mgr number but to display manager
+       name perform self join.
+ 
+          SELECT a.ename|| ' reporting to '||b.ename 
+          FROM emp a JOIN emp b
+            ON  a.mgr = b.empno ;
+ 
+             B    A 
+             C    A
+             D    B
+             E    C
+
+         smith reporting to ford
+         allen reporting to blake
+
+   => display employees reporting to blake ?
+
+       SELECT a.ename|| ' reporting to '||b.ename 
+          FROM emp a JOIN emp b
+            ON  a.mgr = b.empno  
+         WHERE b.ename='BLAKE' ;
+
+ => display blake's manager name ?
+
+        SELECT a.ename,b.ename
+          FROM emp a JOIN emp b
+            ON  a.mgr = b.empno  
+         WHERE a.ename='BLAKE' ;
+
+ => display employees earning more than their managers ?
+
+       SELECT a.ename,a.sal,b.ename as mgr,b.sal as mgrsal
+          FROM emp a JOIN emp b
+            ON  a.mgr = b.empno  
+         WHERE a.sal > b.sal ;
+
+  => display employees having more experience than their managers ?
+
+      SELECT a.ename,a.hiredate,b.ename,b.hiredate
+          FROM emp a JOIN emp b
+            ON  a.mgr = b.empno  
+         WHERE a.hiredate < b.hiredate ;
+
+ Question :- 
+ -----------
+
+   TEAMS  
+   ID	 COUNTRY
+   1	 IND
+   2     AUS
+   3     RSA 
+  
+  write the query to display following output ? 
+
+   IND VS AUS
+   IND VS RSA
+   AUS VS RSA
+
+   TEAMS A			TEAMS B
+   ID	COUNTRY			ID  COUNTRY
+   1	IND			1	IND
+   2	AUS			2	AUS
+   3	RSA			3	RSA
+
+  SELECT a.country||' vs '||b.country
+  FROM teams a JOIN teams b
+    ON a.id < b.id
+   
+   ind aus
+   ind rsa 
+   aus rsa
+
+ cross join :- 
+ ------------
+
+ => cross join returns cross product or cartesian product of
+    two tables.
+  
+    A = 1,2
+    B = 3,4
+  
+  AXB = (1,3 ) (1,4) (2,3) (2,4) 
+
+ => if cross join performed between two tables then all the
+    records of 1st table joined with all the records of 2nd
+    table.
+
+  => to perform cross join submit the join query without
+     join condition.
+
+     SELECT e.ename,d.dname
+      FROM emp e CROSS JOIN dept d ;
+     
+joining more than 2 tables :- 
+-----------------------------
+
+ SELECT columns
+ FROM tab1 JOIN tab2
+   ON condition
+           JOIN tab3 
+   ON condition
+          JOIN tab4
+   ON condition 
+
+ example 1 :- 
+  
+ EMP        DEPT        LOCATIONS       COUNTRIES
+ empid      deptno      locid           country_id
+ ename      dname       city            country_name
+ sal        locid       state
+ deptno                 country_id
+ 
+ => display  ENAME   DNAME    CITY   STATE   COUNTRY_NAME ?
+             ------  -----    -------------  -------------
+               emp   dept     locations      countries 
+
+   SELECT e.ename,
+          d.dname,
+          l.city,l.state,
+          c.country_name
+   FROM  emp e INNER JOIN dept d
+     ON  e.deptno = d.deptno 
+               INNER JOIN locations l
+     ON  d.locid = l.locid
+               INNER JOIN countries c
+     ON  l.country_id = c.country_id
+
+  example 2 :- 
+
+  display   ENAME    DNAME    GRADE  ?
+            -----    -----    ------
+             EMP     DEPT     SALGRADE 
+
+   SELECT e.ename,d.dname,s.grade  
+     FROM emp e INNER JOIN dept d
+      ON e.deptno = d.deptno 
+                JOIN salgrade s
+     ON  e.sal BETWEEN s.losal AND s.hisal ; 
+
+ example 3 :- 
+
+     display  ENAME  DNAME  GRADE   MNAME   ?
+              -----  -----  -----   ------
+               EMP   DEPT   SALGRADE  EMP
+
+    SELECT e.ename, 
+           d.dname,   
+           s.grade, 
+           m.ename as manager
+   FROM  emp e INNER JOIN dept d 
+     ON  e.deptno = d.deptno
+               JOIN salgrade s
+     ON  e.sal BETWEEN s.losal AND s.hisal 
+               JOIN emp m
+     ON  e.mgr = m.empno
+
+  EMP           			DEPT
+   empno  ename  sal  deptno		DEPTNO	DNAME	  LOC
+   1	  A      5000 10  		10	ACCT      NY
+   2      B      3000 20		20	RESEARCH
+   3      C      4000 30		30	SALES
+
+  RESULT :-                           SALGRADE
+  1	  A      5000 	ACCT          GRADE  LOSAL  HISAL
+  2       B      3000 	RESEARCH      1      700   1000
+  3       C      4000 	SALES         2      1001  2000
+                                      3      2001  3000
+                                      4      3001  4000
+                                      5      4001  9999
+ 
+ RESULT :-                               
+                                         EMP
+ 1   A   5000  ACCT      5   NULL        empno  ename   mgr
+ 2   B   3000  RESEARCH  3   1           1      A
+ 3   C   4000  SALES     4   2           2      B
+                                         3      C
+ RESULT
+
+  2   B   3000  RESEARCH  3   1   A
+  3   C   4000  SALES    4   2   B
+
+ SELECT e.ename,d.dname,s.grade,m.ename
+
+     B   RESEARCH  3   A
+     C   SALES     4   B 
+
+  EMP
+  empid  ename
+  100
+  101
+  102  
+  103
+  104
+
+ select count(*)
+ from emp a,emp b,emp c
+
+ what is the output of the above query ?
+
+ a  25
+ b  100
+ c  125
+ d  5
+
+ ans :- c 
+
+07-JUL-22
+
+SET operators :- 
+-----------------
+
+UNION
+UNION ALL
+INTERSECT
+MINUS
+
+A = 1,2,3,4
+B = 1,2,5,6
+
+ A UNION  B     =   1,2,3,4,5,6
+ A UNION ALL B  =   1,2,3,4,1,2,5,6
+ A INTERSECT B  =   1,2 
+ A MINUS B      =   3,4 
+ B MINUS A      =   5,6
+
+ => in oracle set operations are performed between output of
+    two queries.
+
+   SELECT statement 1
+   UNION/UNION ALL/INTERSECT/MINUS
+   SELECT statement 2 ;
+
+  Rules :- 
+  ---------
+
+  1  no of columns return by both queries must be same
+  2  corresponding columns datatype must be same 
+ 
+   SELECT job FROM emp WHERE deptno=20 ;
+
+  CLERK
+  MANAGER
+  ANALYST
+  CLERK
+  ANALYST
+
+  SELECT job FROM emp WHERE deptno=30 ;
+ 
+  SALESMAN
+  SALESMAN
+  SALESMAN
+  MANAGER
+  SALESMAN
+  CLERK
+ 
+ UNION :- 
+ -------
+
+  => combines rows return by two queries
+  => duplicates are eliminated 
+  => result is sorted 
+
+  SELECT job FROM emp WHERE deptno=20 
+  UNION
+  SELECT job FROM emp WHERE deptno=30 ;
+
+ CLERK
+ MANAGER
+ ANALYST
+ SALESMAN 
+ 
+ scenario :- 
+ ----------
+
+ emp_us
+ eno  ename  dno 
+                                     dept
+ emp_ind                             dno  dname  loc
+ eno  ename  dno
+
+=> total employee list ?
+
+   SELECT * FROM emp_us
+   UNION
+   SELECT * FROM emp_ind ;
+
+ => employees working at US loc with dept details ?
+
+   SELECT e.*,d.*
+   FROM emp_us e  INNER JOIN dept d
+    ON  e.dno = d.dno ; 
+
+ => total employee list with dept details ?
+
+   SELECT e.*,d.*
+   FROM emp_us e  INNER JOIN dept d
+    ON  e.dno = d.dno  
+   UNION 
+  SELECT e.*,d.*
+   FROM emp_ind e  INNER JOIN dept d
+    ON  e.dno = d.dno  
+
+		  DEPT
+                 dno  dname
+                 10   HR
+                 20   IT
+EMP_US                            EMP_IND
+ENO  ENAME DNO                    ENO  ENAME  DNO
+1    A     10                     100  X      10
+2    B     20                     101  Y      20
+
+ UNION ALL :- 
+ ------------
+
+ => combines rows return by two queries
+ => duplicates are not eliminated
+ => result is not sorted 
+
+ SELECT job FROM emp WHERE deptno=20
+ UNION ALL
+ SELECT job FROM emp WHERE deptno=30 ;
+
+  CLERK
+  MANAGER
+  ANALYST
+  CLERK
+  ANALYST
+  SALESMAN
+  SALESMAN
+  SALESMAN
+  MANAGER
+  SALESMAN
+  CLERK
+
+ => diff b/w UNION & UNION ALL ?
+
+       UNION                  UNION ALL
+
+  1   duplicates are          duplicates are not eliminated 
+      eliminated
+
+  2   result is sorted        result is not sorted 
+ 
+  3  slower                   faster
+
+ INTERSECT :- 
+ ------------
+
+ => returns common values from the output of two select stmts.
+
+   SELECT job FROM emp WHERE deptno=20
+   INTERSECT 
+   SELECT job FROM emp WHERE deptno=30 ;
+
+  CLERK
+  MANAGER
+
+ MINUS :-  
+ -------
+
+ => returns values present in 1st query output and not present   
+   in 2nd query output
+
+   SELECT job FROM emp WHERE deptno=20
+   MINUS
+   SELECT job FROM emp WHERE deptno=30 ;
+
+   ANALYST
+
+   SELECT job FROM emp WHERE deptno=30
+   MINUS
+   SELECT job FROM emp WHERE deptno=20 ;
+  
+   SALESMAN
+
+ Question :- 
+ ----------
+
+ T1		T2
+ F1		C1
+ 1		1
+ 2		2
+ 3		3
+ 10		40
+ 20		50
+ 30		60
+
+ write the output for following operations ?
+
+ 1 inner join
+ 2 left outer join
+ 3 right outer join
+ 4 full outer join
+ 5 union
+ 6 union all
+ 7 intersect
+ 8 minus
+
+1 
+
+ 1	1
+ 2	2
+ 3	3
+
+2
+   1	1
+   2	2
+   3	3
+   10
+   20
+   30
+
+ 3  
+
+   1	1
+   2	2
+   3	3
+  null  40
+  null  50
+  null  60
+
+ 4
+   1	1
+   2	2
+   3	3
+   10   null	
+   20  null
+   30  null
+   null 40
+   null 50
+   null 60
+
+ 5  1
+    2
+    3
+    10
+    20
+    30
+    40
+    50
+    60
+
+ 6  1
+    2
+    3
+    10
+    20
+    30
+    1
+    2
+    3
+    40
+    50
+    60
+ 
+7  
+
+  1
+  2
+  3
+
+ 8  
+
+   10
+   20
+   30 
+
+ 08-jul-22
+
+ SUBQUERIES / NESTED QUERIES :- 
+ ------------------------------
+ 
+ => a query in another query is called subquery or nested query
+ => one query is called inner / child / sub query
+ => other query is called outer / parent / main query
+ => first oracle executes inner query then oracle executes outer query
+ => output of inner query is input to outer query.
+ => use subquery when where cond based on unknown value.
+    
+  Types of subqueries :- 
+  ----------------------
+ 
+  1 single row subqueries
+  2 multi row subqueries
+  3 co-related subqueries
+  4 inline views 
+ 
+ single row subqueries :- 
+ -------------------------
+
+ => if inner query returns one value then it is called
+    single row subquery.
+
+    SELECT columns
+    FROM tabname
+    WHERE colname OP (SELECT statement) 
+
+ =>  OP must be any relational operator like =  >  >=  <   <=  <> 
+ 
+ examples :- 
+
+  => display employees earning more than blake ? 
+
+    SELECT empno,ename,sal
+    FROM emp 
+    WHERE sal > (SELECT sal FROM emp WHERE ename='BLAKE');
+
+  => display employees who are senior to king ?
+
+    SELECT empno,ename,hiredate  
+    FROM emp 
+    WHERE hiredate < (SELECT hiredate 
+                      FROM emp 
+                      WHERE ename='KING') ;
+
+9-jul-22
+
+ => name of the employee earning max salary ?
+
+   SELECT ename
+   FROM emp 
+   WHERE sal  =  MAX(sal) ;  => error
+
+  NOTE :- group/aggregate functions are not allowed in where
+  clause and they are allowed only in SELECT,HAVING clauses.
+
+    SELECT ename
+    FROM emp 
+    WHERE sal  =  (SELECT MAX(sal) FROM emp) ;
+
+ => name of the employee having max experience ?
+
+    SELECT ename
+    FROM emp 
+    WHERE hiredate = (SELECT MIN(hiredate) FROM emp) ;
+
+=> display employees having min,max experience ?
+
+   SELECT ename,hiredate
+   FROM emp
+   WHERE hiredate  = (SELECT MIN(hiredate) FROM emp)
+         OR
+         hiredate =  (SELECT MAX(hiredate) FROM emp) ;
+
+   SELECT ename,hiredate
+   FROM emp
+   WHERE hiredate  = (SELECT MIN(hiredate) FROM emp)
+   UNION
+   SELECT ename,hiredate
+   FROM emp
+   WHERE hiredate  = (SELECT MAX(hiredate) FROM emp) ;
+
+ => display 2nd max salary ? 
+  
+    sal  
+    1000
+    3000
+    2000
+    1500
+    5000 
+  
+  SELECT MAX(sal)
+  FROM emp 
+  WHERE sal < (SELECT MAX(sal) FROM emp) ;
+              ---------------------------
+                      5000
+
+ => name of the employee earning 2nd max sal ? 
+
+    SELECT ename,sal
+    FROM emp 
+    WHERE sal = (SELECT MAX(sal)
+                 FROM emp 
+                 WHERE sal < (SELECT MAX(sal) FROM emp)) ;
+
+ SELECT col1,col2 FROM tabname ; 
+
+  no of values return by col1 = no of values return by col2 
+
+1  SELECT ename,sal FROM emp ;  =>  valid
+          14    14 
+
+2 SELECT min(sal),max(sal) FROM emp ;    => valid
+         -------- --------
+           1       1
+
+3  SELECT ename,MAX(sal) FROM emp ;   => ERROR
+          ---- ---------
+          14    1
+
+4 SELECT ename,LENGTH(ename) FROM emp ; valid
+         ----- --------------
+           14    14 
+
+NOTE :- 
+-------
+
+ => subqueries can also be nested in INSERT,UPDATE,DELETE    
+    commands.
+
+ => outer query can be SELECT/INSERT/UPDATE/DELETE but  
+    inner query must be always SELECT.
+
+ => delete the employee having max experience ? 
+
+   DELETE FROM emp 
+   WHERE hiredate = (SELECT MIN(hiredate) 
+                    FROM emp);
+
+ => hike the employee sal by 10% having max experience ? 
+
+   UPDATE emp 
+   SET sal = sal + (sal*0.1) 
+   WHERE hiredate = (SELECT MIN(hiredate) FROM emp);
+
+ Question :- 
+ ------------
+
+ => swap employee salaries whose empno=7369,7499 ?
+
+  before              after
+  7369   800          7369  1600
+  7499  1600          7499  800
+ 
+  UPDATE emp
+  SET sal =  CASE empno
+             WHEN 7369 THEN (SELECT sal FROM emp WHERE empno=7499)
+             WHEN 7499 THEN (SELECT sal FROM emp WHERE empno=7369)
+             END  
+ WHERE empno IN (7369,7499) ;
+
+ Multirow subqueries :- 
+ ------------------------
+
+ => if subquery returns more than one value then it is called
+    multirow subquery.
+
+   SELECT columns
+   FROM tabname
+   WHERE colname OP (SELECT statement) ;
+
+ => OP must be IN,NOT IN,ANY,ALL 
+
+  11-jul-22
+
+  ROWNUM :- 
+  ---------
+
+  => returns record numbers for the records return by select stmt.
+  => rownum is psuedo column.
+  => because rownum is not a column but acts like a column.
+  => rownum is useful when fetching records from table is 
+     based on record number.
+ 
+  ex :- 
+
+1   SELECT rownum,empno,ename,sal FROM emp ; 
+
+    1   7369  SMITH  800
+    2   7499  ALLEN  1600
+    3   7521  WARD   1250 
+ 
+    9  8839   KING   5000
+
+2    SELECT rownum,empno,ename,sal FROM emp  WHERE sal>2000;
+
+     5  7839  KING  5000
+
+3  SELECT rownum,empno,ename,sal FROM emp  WHERE sal>=3000;
+
+     2  7839  KING  5000
+
+=> rownum is not based on table and it is based on select stmt
+   output, if query output changes rownum also changes.
+
+ => display first 5 rows from emp ? 
+
+   SELECT empno,ename,sal
+   FROM emp 
+   WHERE rownum <= 5; 
+
+=> display 5th row ?
+
+   SELECT empno,ename,sal
+   FROM emp 
+   WHERE rownum = 5 ; => NO ROWS
+
+   SELECT empno,ename,sal
+   FROM emp 
+   WHERE rownum <= 5    
+   MINUS
+   SELECT empno,ename,sal
+   FROM emp 
+   WHERE rownum <= 4  ;
+
+  note :- with rownum in where cond  =  >  >=  will not work
+  only <   <=  operators works. 
+
+ => display 5th,7th,11th records ?
+   
+    SELECT case rownum
+           when 5 then empno
+           when 7 then empno
+           when 11 then empno
+           end
+   FROM emp  ;
+
+ => above query returns only empnos but to display complete row
+
+  SELECT empno,ename,sal
+  FROM emp 
+  WHERE empno  IN  (SELECT case rownum
+                        when 5 then empno
+                        when 7 then empno
+                        when 11 then empno 
+                        end
+                  FROM emp) ;
+
+  SELECT *
+  FROM emp 
+  WHERE empno  IN  (7654,7782,7876) ;        
+
+ => display 5th to 10th record ?
+
+   SELECT empno,ename,sal
+   FROM emp
+   WHERE empno IN (SELECT case  
+                         when rownum BETWEEN 5 AND 10 then empno
+                         end
+                  FROM emp );
+
+ => display Mth to Nth record ? 
+
+   SELECT case  
+          when rownum BETWEEN &M AND &N then empno
+          end
+   FROM emp ;
+ 
+ => display even no rows ? 
+
+    SELECT case MOD(rownum,2)
+           when 0 then empno
+           end
+   FROM emp  ;
+
+=> display last 3 rows ? 
+   
+  SELECT empno,ename,sal FROM emp 
+  MINUS
+  SELECT empno,ename,sal 
+  FROM emp  
+  WHERE rownum<(SELECT COUNT(*)-2 FROM emp);
+
+12-JUL-22
+
+ co-related subqueries :-  
+ ------------------------
+
+ => if inner query references values of outer query then it is
+    called co-realated subquery.
+
+ => here execution starts from outer query and inner query is
+    executed for each row return by outer query.
+
+ => use co-related subquery to execute subquery for every row
+    return by outer query.
+
+ example 1 :- 
+
+ => find employees earning more than avg(sal) of their dept ?
+
+    EMP
+    EMPNO  ENAME SAL  DEPTNO
+    1      A     5000 10
+    2      B     3000 20
+    3      C     4000 30
+    4      D     6000 20
+    5      E     3000 10
+
+   SELECT empno,ename,sal,deptno 
+   FROM emp a
+   WHERE sal > (SELECT AVG(sal) FROM emp  
+                     WHERE deptno = a.deptno) ;
+
+1      A     5000 10    5000 > (SELECT AVG(sal) FROM emp  
+                                    WHERE deptno = 10)
+                               4000  TRUE
+
+ 2      B     3000 20   3000 > (SELECT AVG(sal) FROM emp  
+                                    WHERE deptno = 20) 
+                               4500   FALSE
+
+ 3      C     4000 30   4000 > (SELECT AVG(sal) FROM emp  
+                                    WHERE deptno = 30)
+                               4000  FALSE
+
+ 4      D     6000 20   6000 > (SELECT AVG(sal) FROM emp  
+                                    WHERE deptno = 20)
+                                4500  TRUE
+
+ 5      E     3000 10   3000 > (SELECT AVG(sal) FROM emp  
+                                    WHERE deptno = 10)
+                                4000  FALSE
+
+ 2  display employees earning max salary in their dept ? 
+
+   SELECT empno,ename,sal,deptno 
+   FROM emp a
+   WHERE sal = (SELECT MAX(sal)
+                FROM emp 
+                WHERE deptno = a.deptno) ;
+
+   EMP
+    EMPNO  ENAME SAL  DEPTNO
+    1      A     5000 10       5000 = (5000)  TRUE
+    2      B     3000 20       3000 = (6000)  FALSE
+    3      C     4000 30       4000 = (4000)  TRUE
+    4      D     6000 20       6000 = (6000)  TRUE
+    5      E     3000 10       3000 = (5000)  FALSE
+   
+=> display top 3 max salaries ?
+
+   EMP 
+   sal
+   5000
+   1000
+   3000
+   2000
+   4000
+
+  SELECT a.sal
+  FROM emp a
+  WHERE 3 > (SELECT COUNT(b.sal)
+             FROM emp b
+             WHERE a.sal < b.sal);
+ 
+  EMP  a          EMP  b
+   sal            sal       
+   5000           5000    3 > (0)  TRUE
+   1000           1000    3 > (4)  FALSE  
+   3000           3000    3 > (2)  TRUE
+   2000           2000    3 > (3)  FALSE
+   4000           4000    3 > (1)  TRUE
+  
+ 
+ INLINE VIEWS :- 
+ ----------------
+
+ => subqueries in FROM clause are called INLINE views.
+
+   SELECT *
+   FROM (select statement)  <alias>
+   WHERE cond ;
+
+ => subquery output acts like a table for outer query
+
+ => INLINE views are used in following cases
+
+  1 to control order of execution of clauses
+  2 to use result of one operation in another operation
+
+ => by default oracle executes the clauses in the following order
+
+   FROM
+   WHERE
+   GROUP BY
+   HAVING
+   SELECT
+   ORDER BY
+
+ => use INLINE views to control this order of execution
+
+ example 1 :- 
+ -----------
+
+ => display ranks of the employees based on sal and 
+    highest paid employee should get 1st rank ? 
+
+    SELECT empno,ename,sal,
+           dense_rank() over (order by sal desc) as rnk
+    FROM emp ;
+
+    KING 	5000  	1
+    FORD 	3000  	2
+    SCOTT 	3000	2
+    JONES	2975	3	
+  
+ => above query returns ranks of all the employees but to 
+    display top 5 employees 
+
+    SELECT empno,ename,sal,
+           dense_rank() over (order by sal desc) as rnk
+    FROM emp 
+    WHERE rnk<=5 ;  => ERROR
+
+  => column alias cannot be referenced in where clause
+     because where clause is executed before select.
+     To overcome this problem use INLINE views.
+
+ 14-jul-22
+ 
+    SELECT  *
+    FROM (SELECT empno,ename,sal,
+             dense_rank() over (order by sal desc) as rnk
+         FROM emp) e
+    WHERE rnk<=5 ;
+
+   e
+   empno  ename   sal   rnk       
+                         1
+
+                        14
+  SELECT *
+  FROM e
+  WHERE rnk<=5 ;
+ 
+ example 2 :- 
+
+ => display 5th record from emp table ?
+ 
+  SELECT *
+  FROM (SELECT rownum as rno,empno,ename,sal 
+        FROM emp) e
+  WHERE rno=5  ;
+  
+  WHERE rno IN (5,7,11) ;
+
+  WHERE rno BETWEEN 5 AND 10 ;
+  
+  WHERE MOD(rno,2)=0;
+
+  => display last 3 rows from emp table ? 
+
+    SELECT *
+    FROM (SELECT rownum as rno,empno,ename,sal 
+         FROM emp) e
+    WHERE rno >= (SELECT COUNT(*)-2 FROM emp) ;
+
+ example 3 :- 
+
+  T1		T2
+  F1		C1
+  10		A
+  20		B
+  30		C
+
+ output :- 
+
+ 10	A  
+ 20	B
+ 30	C
+
+ 
+ SELECT ROWNUM as rno,f1 FROM T1
+
+  1	10
+  2	20
+  3	30
+
+  SELECT ROWNUM as rno,c1 FROM T2 
+
+  1	A
+  2	B
+  3	C
+
+=> join these two queries output based on rno.
+
+SELECT e1.f1,e2.c1
+FROM (SELECT ROWNUM as rno,f1 FROM T1) as e1 INNER JOIN
+     (SELECT ROWNUM as rno,c1 FROM T2) as e2
+  ON e1.rno = e2.rno 
+
+  1  10              1   A
+  2  20   inner join 2   B
+  3  30              3   C
+
+  10  A  
+  20  B
+  30  C
+
+  example 4 :- 
+
+ T1 
+ AMT
+ 1000
+ -500
+ 2000
+ -1000
+ 3000
+ -800
+
+ OUTPUT :- 
+
+   pos      neg
+   1000    -500
+   2000    -1000
+   3000    -800
+
+=====================================================================
+
+ writing queries :- 
+ -----------------
+
+1 DDL commands
+2 DML commands
+3 DRL command (select) 
+    simple select stmt 
+    where 
+    order by 
+    functions
+    group by & having
+    joins
+    set operators
+    subqueries
+
+ DB objects :- 
+---------------
+
+ TABLE
+ VIEWS
+ SEQUENCES 
+ INDEXES 
+ PROCEDURES
+ FUNCTIONS
+ TRIGGERS 
+ 
+ SEQUENCE :- 
+ ----------
+ 
+ => used to generate sequence numbers.
+ => used to auto increment column values.
+
+ syntax :- 
+
+ CREATE SEQUENCE <name>
+ [START WITH <value>]
+ [INCREMENT BY <value>]
+ [MAXVALUE <value>]
+ [MINVALUE <value>]
+ [CYCLE/NOCYCLE]
+ [CACHE <size>]
+
+ Example 1 :- 
+
+ CREATE SEQUENCE S1
+ START WITH 100
+ INCREMENT BY 1
+ MAXVALUE 105 ;
+
+ CREATE TABLE student
+ (
+  sid  NUMBER(3),
+  sname VARCHAR2(10)
+ );
+
+ => use above sequence to generate sid while inserting new records
+
+ INSERT INTO student VALUES(S1.NEXTVAL,'A');
+ INSERT INTO student VALUES(S1.NEXTVAL,'B');
+ INSERT INTO student VALUES(S1.NEXTVAL,'C');
+ INSERT INTO student VALUES(S1.NEXTVAL,'D');
+ INSERT INTO student VALUES(S1.NEXTVAL,'E');
+ INSERT INTO student VALUES(S1.NEXTVAL,'F');
+ INSERT INTO student VALUES(S1.NEXTVAL,'G'); => ERROR
+
+ SELECT * FROM student ;
+
+  SID	SNAME
+  100	A
+  101	B
+  102	C
+  103	D
+  104	E
+  105	F
+
+example 2 :- 
+
+ CREATE SEQUENCE S2
+ START WITH 100
+ INCREMENT BY 1 
+ MAXVALUE 999;
+
+ => use above sequence to make employee numbers in order 
+
+  UPDATE emp SET empno = S2.NEXTVAL ;
+
+ example 3 :- 
+
+  VEHICLES
+  VEHNO    NAME   MODEL
+
+  TS 08 EF 0001
+           0002
+           0003
+           9999
+  
+  CREATE TABLE VEHICLES
+  (
+   VEHNO  VARCHAR2(20),
+   NAME   VARCHAR2(10),
+   MODEL  NUMBER(4)
+  );
+ 
+  CREATE SEQUENCE S3
+  START WITH 1
+  INCREMENT BY 1
+  MAXVALUE 9999;
+
+ => use above sequence to generate values for vehno 
+
+  INSERT INTO VEHICLES 
+      VALUES('TS 08 EF '||TO_CHAR(S3.NEXTVAL,'0000'),
+                              '&name',&model);
+  
+15-jul-22
+
+  CYCLE/NOCYCLE :- 
+  ---------------
+ 
+  => by default sequence created with NOCYCLE.
+
+  => if sequence created with NOCYCLE then it starts from
+     START WITH and generates upto MAXVALUE and after reaching   
+     MAXVALUE then it stops.
+
+  => if sequence created with CYCLE then it starts from 
+     START WITH and generates upto MAXVALUE and after
+     reaching MAXVALUE then it will be reset to MINVALUE.
+
+  CREATE SEQUENCE S5
+  START WITH 3
+  INCREMENT BY 1
+  MAXVALUE 5
+  MINVALUE 1
+  CYCLE
+  CACHE 3 ;
+
+  NOTE :-  START WITH >=  MINVALUE 
+
+  SQL>SELECT S5.NEXTVAL FROM DUAL ;   
+
+ CACHE size :- 
+ ------------
+
+  CREATE SEQUENCE S10
+  START WITH 1
+  INCREMENT BY 1
+  MAXVALUE 1000
+  MINVALUE 1
+  CYCLE
+  CACHE 100 ;
+ 
+  => oracle preallocates 100 values in cache memory , so
+     everytime we call seq.nextval then it goes to cache memory
+     and gets the value and accessing cache memory is much
+     fater than accessing db , so this improves performance.
+
+ =>  default cache size is 20
+
+ => cache size must be less than 1 cycle.
+
+  Question :-  
+  -----------
+
+  CREATE SEQUENCE S11
+  START WITH 1
+  INCREMENT BY 1
+  MAXVALUE 10 
+  MINVALUE 1
+  CYCLE  ;
+   
+  
+ => above command returns error what could be the reason ?
+
+   ANS :- default cache size is 20 but it is not less than 
+          cycle(10).
+
+  Droping Sequence :- 
+  -------------------
+
+   DROP SEQUENCE S1 ; 
+ 
+  INDEXES :- 
+  ----------
+
+ => index is also a db object created to improve the performance 
+    of data accessing or locating the records in table.
+
+ => index improves performance of search operation.
+
+ => index in db is similar to index in textbook , In textbook
+    using index a particular topic can be located fastly 
+    and in db using index a particular record can be located
+    fastly.
+
+ => indexes are created on columns 
+
+   1 that are frequently accessed in where clause.
+   2 used in join operation.
+ 
+ Types of Indexes :- 
+ ------------------
+
+ 1 simple index
+ 2 composite index
+ 3 unique index 
+
+ simple index :- 
+ ---------------
+
+ => if index created on single column then index is called
+    simple index.
+
+   syn :- CREATE INDEX <NAME> ON <TABNAME>(COLNAME);
+
+   ex :-  CREATE INDEX I1 ON EMP(SAL);
+
+  => after executing above command oracle creates a structure
+     called BTREE (balance binary tree) and with the help
+     of BTREE oracle locates the data fastly.
+
+  EMP			       3000
+  sal
+  5000
+  1000                2000                   4000
+  3000
+  2000        1000 *       2500 *       4000 *        5000 * 
+  1500        1500 *       3000 *,*
+  3000        2000 *
+  2500
+  4000
+
+ => when we submit a query to oracle , it uses following
+    methods to access data 
+
+ 1  TABLE SCAN
+ 2  INDEX SCAN
+
+=> in table scan oracle scans complete table i.e. each and 
+   every row but in index scan on avg oracle scans only
+   half of the table so index scan is much faster than
+   table scan.
+
+  SELECT * FROM emp WHERE sal=3000 ;  (INDEX SCAN)
+  SELECT * FROM emp WHERE sal>=3000 ; (INDEX SCAN)
+  SELECT * FROM emp WHERE sal<=3000 ; (INDEX SCAN)
+  SELECT * FROM emp WHERE ename='BLAKE' ; (TABLE SCAN)
+  SELECT * FROM emp ;                     (TABLE SCAN)
+
+ 16-JUL-22
+
+ composite index :- 
+ ------------------
+
+ => if index based on multiple columns then index is called
+    composite index.
+
+    ex :- CREATE INDEX I2 ON emp(deptno,job) ;
+
+  EMP
+  deptno   job
+  20       CLERK
+  30       SALESMAN
+  30       SALESMAN
+  10       MANAGER
+  20       MANAGER
+  30       CLERK
+  30       MANAGER
+  10       CLERK
+		
+			      20
+
+                  10                       40    
+
+       10 CLERK *     20 CLERK *    30 CLERK *
+       10 MGR  *      20 MGR *      30 MGR *
+                                    30 SALESMAN *,*
+
+  => oracle uses above index when where condition based on
+     deptno.
+
+     SELECT * FROM emp WHERE deptno=20 ; (index scan)
+     SELECT * FROM emp WHERE deptno=20 AND job='CLERK' ; (index)
+     SELECT * FROM emp WHERE job='CLERK' ; (table)
+ 
+ UNIQUE index :- 
+ ----------------
+
+ => unique index doesn't allow duplicate values into the
+    column on which index is created.
+
+    ex :- CREATE UNIQUE INDEX I3 ON EMP(ENAME); 
+
+                           K
+
+                G                    Q
+ 
+    ADAMS *        JAMES *    MARTIN *      SMITH *
+    ALLEN *        JONES *    MILLER *      SCOTT *
+    BLAKE *        KING *                   
+    CLARK *
+    
+    SELECT * FROM emp WHERE ename='BLAKE' ;
+
+    INSERT INTO emp(empno,ename,sal) 
+                 VALUES(999,'BLAKE',3000); => ERROR
+ 
+    => How many methods are there to enforce uniqueness ?
+
+     1  declare primary key/unique constraint
+     2  create unique index 
+
+  NOTE :- 
+
+  => primary key / unique columns are automatically indexed by
+     oracle and oracle creates unique index on primary key/unique
+     columns and unique index doesn't allow duplicates so
+     primary key / unique also doesn't allow duplicates.
+ 
+ USER_INDEXES :- 
+ ---------------
+
+  => system table that stores indexes created by user.
+
+    list of indexes created on emp table ? 
+
+    SELECT INDEX_NAME,INDEX_TYPE
+    FROM USER_INDEXES
+    WHERE TABLE_NAME='EMP' ;
+ 
+   Droping index :- 
+   ---------------
+
+   DROP INDEX I1 ;
+
+  NOTE :- we cannot drop index created on primary key column
+  
+   if we drop table what about indexex created on table ? 
+
+   ans :- indexes are also dropped
+
+   SERVER
+     DATABASE
+          USER
+              TABLES
+                  ROWS & COLS
+                  CONSTRAINTS
+                  INDEXES
+                  TRIGGERS 
+              VIEWS
+              SEQUENCES
+              SYNONYMS
+              PROCEDURES
+              FUNCTIONS
+              PACKAGE
+   
+ 18-JUL-22
+
+ creating user in oracle :- 
+ -------------------------
+
+  SYSTEM/MANAGER
+
+  SQL>CREATE USER C##VIJAY IDENTIFIED BY ORACLE
+      DEFAULT TABLESPACE USERS
+      QUOTA UNLIMITED ON USERS;
+
+  SQL>GRANT CONNECT,RESOURCE TO C##VIJAY ;
+
+ 
+ NOTE :- 
+ -------
+
+ => tables created by C##BATCH9AM cannot be accessed by C##VIJAY , if
+    C##VIJAY wants to access tables then C##BATCH9AM has to given permissions
+    by using GRANT command.
+
+ Granting permissions on tables to user :- 
+ -----------------------------------------
+
+   SYN :- GRANT <permissions/privileges> ON <tabname> TO <username> ;
+
+ C##BATCH9AM :- 
+ --------------
+
+  SQL>GRANT ALL ON EMP TO C##VIJAY;
+
+ C##VIJAY : -
+ -----------
+
+ 1   SELECT * FROM C##BATCH9AM.EMP;
+
+ 2   UPDATE C##BATCH9AM.EMP SET SAL=2000 WHERE EMPNO=7369;
+
+ NOTE :- changes made by C##VIJAY visible to C##BATCH9AM only after
+ COMMIT.
+
+ Granting specific privileges :- 
+ ------------------------------
+
+ C##BATCH9AM :- 
+ -------------
+
+ SQL>GRANT SELECT,INSERT ON DEPT TO C##VIJAY ; 
+
+ C##VIJAY :- 
+ ------------
+ 
+ DELETE FROM C##BATCH9AM.EMP WHERE DEPTNO=10 ;   => ERROR
+
+ REVOKE command :- 
+ -----------------
+
+ => command used to take back permissions from user
+
+     syn :- REVOKE <permissions> ON <tabname> FROM <username>;
+
+ C##BATCH9AM :- 
+ --------------
+
+ SQL>REVOKE ALL ON EMP FROM C##VIJAY ; 
+
+ C##VIJAY :- 
+ ------------
+
+ SQL>SELECT * FROM C##BATCH9AM.EMP ;  => ERROR
+
+ Revoking specific privileges :- 
+ -------------------------------
+
+ C##BATCH9AM :- 
+ --------------
+
+ SQL>GRANT ALL ON EMP TO C##VIJAY ;
+
+ SQL>REVOKE INSERT,UPDATE,DELETE ON EMP FROM C##VIJAY;
+ 
+
+ VIEWS :- 
+ --------
+ 
+ => a view is a subset of a table.
+ 
+ => a view is a virtual table because it doesn't store data and
+    doesn't occupy memory and it always derives data from base table.
+
+ => views are created 
+
+    1 for security
+    2 for reduce complexity
+
+ => view provides another level of security by granting specific
+    rows & columns to users.
+
+ => views are 2 types 
+
+   1 simple views
+   2 complex views 
+
+ simple view :- 
+ --------------
+
+ => if view created on single table then it is called simple view 
+
+  syn :-  
+
+  CREATE VIEW <NAME>
+  AS
+  SELECT statement ;
+
+ granting permission to create view :- 
+ ------------------------------------
+
+  SYSTEM/MANAGER
+
+  SQL>GRANT CREATE VIEW TO C##BATCH9AM;
+
+ C##BATCH9AM :- 
+ ---------------
+
+ SQL>CREATE VIEW V1
+     AS
+     SELECT empno,ename,job,deptno FROM emp ;
+
+  view created
+
+ => oracle creates view "v1" and stores query but not query output
+    and whenever we run the query on v1 and that query is executed
+    on base table i.e. emp
+
+    SELECT * FROM v1 ;   
+
+    SELECT * FROM (SELECT empno,ename,job,deptno FROM emp);
+
+  Granting permissions on view to user :- 
+  ---------------------------------------
+
+  C##BATCH9AM :- 
+  --------------
+
+   GRANT ALL ON V1 TO C##VIJAY ; 
+
+  => after granting user c##VIJAY can access emp table through view.
+
+  C##VIJAY :- 
+  ----------
+
+  1   SELECT * FROM C##BATCH9AM.V1 ; 
+
+  2   UPDATE C##BATCH9AM.V1 SET JOB='MANAGER' WHERE EMPNO=7369;
+
+  3   UPDATE C##BATCH9AM.V1 SET SAL=2000 WHERE EMPNO=7369; => ERROR
+
+  ROW LEVEL SECURITY :- 
+  ---------------------
+
+  C##BATCH9AM :- 
+  --------------
+
+  CREATE VIEW V2
+  AS
+  SELECT empno,ename,job,deptno 
+  FROM emp 
+  WHERE deptno=20;
+
+  GRANT ALL ON V2 TO C##VIJAY ;
+
+ 19-jul-22
+
+  complex views :- 
+  ----------------
+
+  => a view said to be complex view if created on 
+
+    1 mutliple tables
+    2 query performs group by
+                     distinct
+                     aggregate
+                     set
+                     subqueries  operations 
+
+ => with the help of views complex queries can be converted into 
+    simple queries.
+
+    example 1 :- 
+
+    CREATE VIEW CV1
+    AS
+    SELECT e.empno,e.ename,e.sal,
+           d.deptno,d.dname,d.loc
+    FROM emp e INNER JOIN dept d
+      ON e.deptno = d.deptno ; 
+
+ => after creating view  whenever we want data from emp & dept tables
+    then instead of writing join query write the simple query as follows
+
+    SELECT * FROM CV1 ; 
+
+  example 2 :- 
+
+   CREATE VIEW CV2
+   AS
+   SELECT deptno,MIN(sal) as minsal,
+                 MAX(sal) as maxsal,
+                 SUM(sal) as totsal,
+                 COUNT(*) as cnt
+   FROM emp
+   GROUP BY deptno ;
+  
+ => whenever we want dept wise summary execute the following simple query
+
+    SELECT  * FROM CV2 ; 
+
+  => diff b/w simple & complex views ?
+
+          simple                    complex 
+  
+  1    based on single table        based on multiple tables 
+
+  2    query performs simple        query performs complex operations
+       operations like              like joins,group by,aggregate etc.
+       where etc
+ 
+  3    updatable i.e. allows dml    not updatable i.e. doesn't allow dmls
+
+  
+ USER_VIEWS :- 
+ -------------
+
+ => stores information about views created by user
+ 
+ => system table that stores infromation about views created by user
+
+  => list of views created by user ?
+
+     SELECT VIEW_NAME FROM USER_VIEWS ;
+  
+  => query associated with view V1 ?
+
+    SELECT TEXT FROM USER_VIEWS WHERE VIEW_NAME = 'V1' ;
+ 
+ Droping view :- 
+ --------------
+  
+   DROP VIEW V1 ; 
+
+ if we drop table what about views created on table ?
+
+  ANS :- views are not dropped but views cannot be queried
+
+ ======================================================================
+
+ SYNONYMS :- 
+ ----------
+
+ => a synonym is another name or alternative name for a table or view.
+
+ => synonyms are created 
+
+   1 if tablename is lengthy
+   2 to access tables without owner name
+
+ => if tablename is lengthy then with the help of synonym we can
+    give simple and short name to the table , so instead of using
+    tablename we can use synonym name in SELECT/INSERT/UPDATE/DELETE
+    queries.
+
+  syn :- CREATE SYNONYM <NAME> FOR <TABNAME> ; 
+
+  granting permission to create synonym :- 
+  ----------------------------------------
+
+  SYSTEM/MANAGER
+
+  GRANT CREATE SYNONYM TO C##BATCH9AM;
+
+ C##BATCH9AM :- 
+ ---------------
+
+   CREATE SYNONYM E FOR EMP ; 
+ 
+ => after creating  synonym instead of using tablename use synonym
+    name in SELECT/INSERT/UPDATE/DELETE queries.
+
+    1   SELECT * FROM E ; 
+
+   2    UPDATE E SET SAL=2000 WHERE EMPNO=7369;
+
+ Example 2 :- (accessing tables without owner name)
+
+  C##BATCH9AM :- 
+  ---------------
+
+  GRANT ALL ON EMP TO C##VIJAY ;
+
+  C##VIJAY :- 
+  -------------
+
+  SELECT * FROM C##BATCH9AM.EMP ;
+
+  CREATE SYNONYM EMP FOR C##BATCH9AM.EMP ;
+
+  SELECT * FROM EMP ; 
+
+  Question :- 
+  -----------
+
+   1  CREATE SYONYM E FOR EMP ;
+
+   2  SELECT * FROM EMP E ;
+
+   3  RENAME EMP TO E ;  => changes tablename from EMP to E.
+
+ diff b/w  synonym and alias ?
+
+          SYNONYM                   ALIAS 
+
+   1   permanent                    not permanent
+
+   2   stored in db                 not stored in db
+
+   3   scope of the synonym         scope of the alias is upto the
+       is upto the schema(user)     query
+
+ USER_SYNONYM :- 
+ -----------------
+
+ => system table that stores synonyms created by user
+
+Droping synonym :- 
+------------------
+
+  DROP SYNONYM E;
+
+===========================================================================
+ 
+  			       SQL
+
+     COMMANDS       CLAUSES      OPERATORS    FUNCTIONS     OBJECTS 
+
+     DDL            WHERE        BETWEEN      STRING        TABLES
+     DML            ORDER BY     IN           DATE          VIEWS
+     DRL            GROUP BY     LIKE         MATHEMATICAL  INDEXES
+     TCL            HAVING       UNION        CONVERSION    SYNONYMS
+     DCL            ON           UNION ALL    SPECIAL       SEQUENCES
+                                 INTERSECT    ANALYTICAL
+                                 MINUS        AGGREGATE
+  
+
+============================================================================
+
+				PL/SQL
+                                ------
+
+                      PL => procedural language
+
+                               ORACLE
+
+                  non-proc                    proc
+
+                  SQL                         PL/SQL
+                 (commands)                   (blocks)
+ 
+  features :- 
+  -----------
+
+  1  improves performance :- 
+  ----------------------------
+
+  => in PL/SQL  , sql commands can be grouped into one block
+     and we submit that block to oracle. so in PL/SQL no of
+     requests and response between user and oracle are reduced
+     and performance is improved.
+
+  2 supports conditional statements :- 
+  ------------------------------------
+
+  => PL/SQL supports conditional statements like IF-THEN-ELSE
+     and using conditional statements we can execute SQL commands
+     based on conditions.
+
+  3 supports loops :- 
+  -------------------
+
+  => loops are used to execute statements repeatedly multiple times
+     and PL/SQL supports looping statements like while,for,simple loop.
+
+ 4  supports error handling :- 
+ ----------------------------
+
+ =>  in PL/SQL , if any statement causes error then we can handle that
+    error and we can replace system generated messages with our own
+    simple and user friendly messages.
+
+ 5  supports reusability :- 
+  -------------------------
+
+  =>  PL/SQL programs can be stored in db , so applications which are
+      connected to db can reuse that programs.
+
+ 6 supports security :- 
+ --------------------
+
+   => because pl/sql programs are stored in db so they are secured  and
+      only authorized users can execute the program.
+
+ 7 supports modular programming :- 
+ -----------------------------------
+
+ => in PL/SQL  a big program can be divided into small modules called   
+    procedures and functions.
+
+  
+ => PL/SQL programs are 2 types 
+
+  1 Anonymous Blocks
+  2 Named Blocks
+         procedures
+         functions
+         packages
+         triggers 
+ 
+  Anonymous Blocks :- 
+  ---------------------
+
+ => a program without name is called anonymous block.
+
+   DECLARE
+     <variables>;   declaration-part    optional
+   BEGIN
+     statements;    execution-part 
+   END;
+    /
+
+  how to print messages :-
+  ------------------------
+
+      DBMS_OUTPUT.PUT_LINE(message) ;
+     ------------ ----------
+        PACKAGE    PROCEDURE
+
+  =>  by default messages are not send to output , to send messages
+      to output execute the following command.
+
+     SQL>SET SERVEROUTPUT ON 
+
+ how to write pl/sql programs :- 
+ -------------------------------
+
+ 1  EDITORS
+ 2  IDEs (integrated development environment)
+
+ 		 EDITOR				IDE
+
+  coding         YES                            YES
+
+  compilation    NO                             YES
+
+  execution      NO                             YES
+
+  debugging     NO                              YES
+
+  IDE => a single environment that integrates all coding,compilation,
+  execution and debugging tools.
+
+    Editors => notepad,editplus 
+
+    IDEs   => SQL Developer,PL/SQL Developer,TOAD
+
+  using notepad :- 
+  ---------------
+
+ => open notepad and enter following code
+
+        begin 
+	  dbms_output.put_line('welcome');
+	end;
+	/
+ 
+ => save the program in a file as D:\PLSQL\"prog1.sql"
+
+ => go to sqlplus and compile and run the program as follows 
+
+   SQL>@D:\PLSQL\PROG1.SQL
+
+    output :- welcome
+
+22-JUL-22
+
+ Datatypes in PL/SQL :- 
+ -------------------------
+
+ 1 NUMBER(P) / NUMBER(P,S)
+ 2 CHAR/VARCHAR2/LONG/CLOB
+ 3 NCHAR/NVARCHAR2/NCLOB
+ 4 DATE/TIMESTAMP
+ 5 BFILE/BLOB
+ 6 BINARY_FLOAT / BINARY_DOUBLE 
+ 7 BINARY_INTEGER
+ 8 BOOLEAN 
+
+  1 TO 6 => allowed in SQL,PL/SQL
+  7,8    => allowed only in PL/SQL but not allowed in SQL
+
+ Declaring variables :- 
+ ---------------------
+
+   syntax :-   variablename    datatype(size);
+
+   ex :-       x    NUMBER(4);
+               s    VARCHAR2(10);
+               d    DATE;
+               b    BOOLEAN;
+
+  Assigning value to variable :- 
+  -------------------------------
+  
+            :=    =>  ASSIGNMENT OPERATOR
+
+        ex :-   x = 100 ; wrong
+
+                x := 100; 
+                s := 'abc';
+                d := SYSDATE;
+                b := TRUE;
+ 
+  => write a prog to add two numbers ?
+
+     DECLARE
+       a  NUMBER(3);
+       b  NUMBER(3);
+       c  NUMBER(4);
+     BEGIN
+        a := 100;
+        b := 200;
+        c := a+b;
+        dbms_output.put_line(c);
+     END;
+      /
+
+ how to input values at runtime :- 
+ ---------------------------------
+
+ => to input values at runtime use variable prefixed with "&".
+
+    1       a   := &a ;
+            enter value for a :- 200
+     
+            a := 200;
+
+   2        a := &x ;
+
+            enter value for x :- 400
+
+             a := 400;
+
+ example :- 
+
+    DECLARE
+       a  NUMBER(3);
+       b  NUMBER(3);
+       c  NUMBER(4);
+     BEGIN
+        a := &a;
+        b := &b;
+        c := a+b;
+        dbms_output.put_line(c);
+     END;
+      /
+
+  enter value for a :-  300
+  enter value for b :-  400
+
+  output :- 700
+
+VERIFY :- 
+---------
+
+ => can be set to ON / OFF
+
+   SET VERIFY OFF  =>  will not display old & new stmts 
+   SET VERIFY ON   =>  will display old & new stmts 
+
+ => write a prog to input date and print day of the week ?
+
+   DECLARE
+     d  DATE; 
+   BEGIN
+     d := '&date';
+     dbms_output.put_line(TO_CHAR(d,'day'));
+   END;
+    /
+
+  enter value for date :- 22-JUL-2022
+
+  output :-  friday
+
+ DB programming with PL/SQL :- 
+ -----------------------------
+
+ => from pl/sql to perform operations on db , execute sql commands
+    from pl/sql program.
+
+ => the following commands can be executed from PL/SQL program.
+
+    1 DML (insert,update,delete,merge,insert all)
+    2 DRL (select)
+    3 TCL (commit,rollback,savepoint)
+ 
+ SELECT stmt syntax :- 
+ ---------------------
+
+ SELECT columns INTO variables
+ FROM tabname
+ WHERE condition ; 
+
+ ex :- 
+
+1  SELECT sal INTO x
+   FROM emp 
+   WHERE empno = 7844;
+
+2  SELECT ename,sal INTO x,y
+   FROM emp
+   WHERE empno = 7844;
+
+ => write a prog to input empno and print name & salary ? 
+
+    DECLARE
+      v_eno      NUMBER(4); 
+      v_ename    VARCHAR2(10);
+      v_sal      NUMBER(7,2);
+   BEGIN
+      v_eno := &empno;     
+      SELECT ename,sal INTO v_ename,v_sal
+      FROM emp
+      WHERE empno = v_eno;
+      dbms_output.put_line(v_ename||'   '||v_sal);
+  END;
+   / 
+
+ enter value for empno :- 7844
+
+ output :-  TURNER   1500
+ 
+ => write a prog to input empno and print experience of the employee ?
+ 
+   DECLARE
+      v_eno   NUMBER(4);
+      v_hire  DATE;
+      v_expr  NUMBER(2);
+   BEGIN
+      v_eno := &empno;
+      SELECT hiredate INTO v_hire
+      FROM emp 
+      WHERE empno = v_eno;
+      v_expr :=  (sysdate-v_hire)/365;
+      dbms_output.put_line('Experience = '||v_expr||' Years');
+   END;
+   / 
+
+ 23-jul-22
+
+ => write a prog to input empno and  display total sal  ?
+
+       total sal = sal + comm 
+
+   DECLARE
+      v_eno   NUMBER(4);
+      v_sal   NUMBER(7,2);
+      v_comm  NUMBER(7,2);
+      v_totsal NUMBER(7,2);
+   BEGIN
+      v_eno := &empno;
+      SELECT sal,comm INTO v_sal,v_comm
+      FROM emp  
+      WHERE empno=v_eno;
+      v_totsal := v_sal + NVL(v_comm,0);
+      dbms_output.put_line('Total sal = '||v_totsal);
+  END;
+   / 
+
+ conditional statements :- 
+ -------------------------
+
+ 1 if-then-else
+ 2 multi if 
+ 3 nested if 
+
+1
+
+ if-then-else :- 
+ ---------------
+
+   if cond then
+     statements;
+   else
+     statements;
+   end if;
+
+2 multi if :- 
+ -------------
+
+  if cond1 then
+    statements;
+  elsif cond2 then
+    statements;
+  elsif cond3 then
+    statements;
+ else
+   statements;
+ end if;
+
+ 3 nested if :- 
+ --------------
+
+  if cond then
+    if cond then
+       statements;
+    else
+      statements;
+    end if;
+  else
+    statements;
+  end if;
+
+=> write a prog to input empno and calculate experience 
+   if expr > 40 then delete the record otherwise incr sal by 10% ?
+
+  DECLARE
+    v_eno  NUMBER(4);
+    v_hire DATE;
+    v_expr NUMBER(2); 
+ BEGIN
+    v_eno := &empno;
+    SELECT hiredate INTO v_hire FROM emp WHERE empno = v_eno;
+    v_expr := (SYSDATE - v_hire)/365;
+    IF v_expr>40 THEN
+       DELETE FROM emp WHERE empno = v_eno;
+    ELSE
+       UPDATE emp SET sal=sal+(sal*0.1) WHERE empno=v_eno;
+    END IF;
+    COMMIT;
+ END;
+  /
+
+  2  write a prog to input empno and increment sal by specific amount
+     after increment if sal exceeds 5000 then cancel that increment ?
+
+     DECLARE
+       v_eno   NUMBER(4);
+       v_amt   NUMBER(4);
+       v_sal   NUMBER(7,2);
+    BEGIN 
+       v_eno := &empno;
+       v_amt := &amount;
+       UPDATE emp SET sal = sal + v_amt  WHERE empno = v_eno;
+       SELECT sal INTO v_sal FROM emp WHERE empno = v_eno;
+       IF v_sal > 5000 THEN
+           ROLLBACK;
+           dbms_output.put_line('transaction cancelled');
+       ELSE
+           COMMIT;
+           dbms_output.put_line('transaction saved');
+       END IF;
+   END;
+    /
+
+input :-
+        
+  enter value for empno :- 7788
+  enter value for amount :- 1000
+
+ output :-  transaction saved 
+
+
+25-jul-22
+
+ => write a prog to input empno and increment employee salary 
+    as follows ?
+
+   if  job=CLERK incr  sal  by  10%
+           SALESMAN             15%
+           MANAGER              20%
+           others               5%
+
+    DECLARE
+      v_eno  NUMBER(4); 
+      v_job  VARCHAR2(10);
+      v_pct  NUMBER(2);
+    BEGIN
+       v_eno := &empno;
+       SELECT job INTO v_job FROM emp WHERE empno=v_eno;     
+       IF v_job='CLERK' THEN
+          v_pct := 10;
+       ELSIF v_job='SALESMAN' THEN
+          v_pct := 15;
+       ELSIF v_job='MANAGER' THEN
+          v_pct := 20;
+       ELSE
+          v_pct := 5;
+       END IF;
+       UPDATE emp SET sal = sal + (sal*v_pct/100) WHERE empno=v_eno;
+       COMMIT;
+    END;
+     /
+  
+ =>  write a prog to input sno and calculate total,avg,result and
+     insert into result table ?
+
+ STUDENT
+ sno  sname  s1   s2   s3
+ 1    A      80   90   70
+ 2    B      60   50   40
+ 3    C      30   50   60
+
+ RESULT
+ sno  stot   savg   sres
+ 
+ DECLARE
+   v_sno  NUMBER(3);
+   v_s1   NUMBER(3);
+   v_s2   NUMBER(3);
+   v_s3   NUMBER(3);
+   v_tot  NUMBER(3);
+   v_avg  NUMBER(5,2);
+   v_res  VARCHAR2(15);
+ BEGIN
+   v_sno := &sno; 
+   SELECT s1,s2,s3 INTO v_s1,v_s2,v_s3 FROM students WHERE sno=v_sno;
+   v_tot := v_s1 + v_s2 + v_s3;
+   v_avg := v_tot/3;
+   IF v_s1>=35 AND v_s2>=35 AND v_s3>=35 THEN
+      IF v_avg >= 70 THEN
+          v_res := 'Distinction';
+      ELSIF v_avg >= 60 THEN
+          v_res := 'First';   
+      ELSIF v_avg >= 50 THEN
+          v_res := 'Second';
+      ELSE
+          v_res := 'Third';
+      END IF;
+   ELSE
+     v_res := 'Fail';
+   END IF;
+   INSERT INTO result VALUES(v_sno,v_tot,v_avg,v_res);  
+   COMMIT;
+ END;
+ /
+
+=> write a prog to process bank transaction (w/d) ?
+
+ ACCOUNTS
+ ACCNO   ACTYPE   BAL
+ 100     S        10000
+ 101     S        20000
+
+ DECLARE    
+  v_acno  NUMBER(4);
+  v_type  CHAR(1);   
+  v_amt   NUMBER(5);
+  v_bal   NUMBER(7);
+ BEGIN
+   v_acno := &acno;
+   v_type := '&type';  
+   v_amt  := &amount;
+   IF v_type='w' THEN
+     SELECT bal INTO v_bal FROM accounts WHERE accno = v_acno;  
+     IF v_amt > v_bal THEN
+        dbms_output.put_line('insufficient balance');
+     ELSE
+        UPDATE accounts SET bal = bal - v_amt WHERE accno = v_acno;
+     END IF;
+   ELSIF v_type='d' THEN 
+       UPDATE accounts SET bal = bal + v_amt WHERE accno = v_acno;
+   ELSE
+       dbms_output.put_line('invalid transaction type');
+   END IF;
+   COMMIT; 
+ END;
+  /
+
+26-jul-22
+
+=> write a prog for money transfer ?
+
+ ACCOUNTS
+ ACCNO   ACTYPE   BAL
+ 100     S        10000
+ 101     S        20000
+
+ DECLARE
+   v_sacno   NUMBER(4);
+   v_tacno   NUMBER(4);
+   v_amt     NUMBER(5);
+   v_bal     NUMBER(7);
+BEGIN
+    v_sacno := &saccno;
+    v_tacno := &taccno;
+    v_amt   := &amount;
+    SELECT bal INTO v_bal FROM accounts WHERE accno=v_sacno;
+    IF v_amt > v_bal THEN
+       dbms_output.put_line('insufficient balance');
+    ELSE
+       UPDATE accounts SET bal=bal-v_amt WHERE accno=v_sacno;
+       UPDATE accounts SET bal=bal+v_amt WHERE accno=v_tacno;
+       COMMIT;
+       dbms_output.put_line('money transfer successful');
+   END IF;
+ END;
+  /
+
+ LOOPS in PL/SQL :- 
+ ------------------
+
+ => loops are used to execute statements repeatedly multiplte times
+ => PL/SQL supports 3 types of loops 
+
+  1  simple loop
+  2  while loop
+  3  for loop
+
+ simple loop :- 
+ --------------
+
+ loop
+    statements;
+    exit when cond;
+ end loop;
+
+  if cond = false loop continues
+  if cond = true loop terminates
+
+ while loop :- 
+ ------------
+
+  while(cond)
+  loop
+     statements;
+  end loop;
+
+  if cond=true loop continues
+  if cond=false loop terminates 
+
+  for loop :- 
+  -----------
+
+  for <var> in <low>..<upp>
+ loop
+   statements;
+ end loop; 
+
+ ex :- 
+
+ for i in 1..10            for(i=1;i<=10;i++)
+loop
+  statements;
+end loop;
+
+ => loop variable "i" declared implicitly as number type
+ => by default "i" is incremented by 1
+ => loop variable "i" is read only
+ 
+examples :- 
+----------
+
+ => write a prog to print numbers from 1 to 20 ?
+
+ using simple loop :- 
+ --------------------
+
+  DECLARE
+    x  NUMBER(2) := 1;
+  BEGIN
+    LOOP
+       dbms_output.put_line(x);
+       x := x+1;
+       exit when x>20;
+    END LOOP;
+  END;
+   /
+
+ using while loop :- 
+ -------------------
+
+ DECLARE
+   x  NUMBER(2) := 1;
+ BEGIN
+  WHILE(x<=20)
+ LOOP
+    dbms_output.put_line(x);
+    x := x+1;
+ END LOOP; 
+ END;
+  /
+
+ using FOR loop :- 
+ ----------------
+
+ BEGIN
+   FOR x IN 1..20
+ LOOP
+    dbms_output.put_line(x);
+    x := x+2 ;    =>  error   x is read only variable
+ END LOOP;
+    dbms_output.put_line(x); => error  scope of the "x" is upto the
+ END;                                  for loop
+  /
+
+ reverse for loop :- 
+ -------------------
+
+ BEGIN
+   FOR x IN REVERSE 1..20
+ LOOP
+   dbms_output.put_line(x);
+ END LOOP; 
+ END;
+ /
+
+ => write a prog to print 2022 calendar ?
+
+   01-jan-2022     ?
+   02-jan-2022     ?
+
+   31-dec-2022     ?
+
+   DECLARE
+    d1  DATE;
+    d2  DATE;
+   BEGIN
+    d1 := '01-JAN-2022';
+    d2 := '31-DEC-2022';
+    WHILE(d1<=d2)
+  LOOP
+     dbms_output.put_line(d1||'       '||TO_CHAR(d1,'day'));
+     d1 := d1+1;
+  END LOOP;
+  END;
+   /
+
+ => write a prog to print sundays in 2022 year ?
+
+   DECLARE
+    d1  DATE;
+    d2  DATE;
+   BEGIN
+    d1 := '01-JAN-2022';
+    d2 := '31-DEC-2022';
+    d1 := next_day(d1,'sunday'); /* first sunday starting from d1 */
+    WHILE(d1<=d2)
+   LOOP
+      dbms_output.put_line(d1||'       '||TO_CHAR(d1,'day'));
+      d1 := d1+7;
+  END LOOP;
+  END;
+   /
+
+27-jul-22
+
+ => write a prog to input string and print following pattern ?
+
+      input :- NARESH
+
+     output :- 
+
+     N
+     A
+     R
+     E
+     S
+     H
+
+   DECLARE
+     s   VARCHAR2(10);
+     b   NUMBER(2);
+   BEGIN 
+     s := '&string';
+     b := LENGTH(s);
+     FOR i in 1..b
+   LOOP
+     dbms_output.put_line(substr(s,i,1));
+   END LOOP;
+  END;
+   /
+ 
+ => write a prog to input string and print following pattern ?
+
+    input :- NARESH
+
+    output :- 
+
+  N
+  NA 
+  NAR
+  NARE
+  NARES
+  NARESH
+
+ 
+   DECLARE
+     s   VARCHAR2(10);
+     b   NUMBER(2);
+   BEGIN 
+     s := '&string';
+     b := LENGTH(s);
+     FOR i in 1..b
+   LOOP
+     dbms_output.put_line(substr(s,1,i));
+   END LOOP;
+  END;
+   /
+
+ => write a prog to print following pattern ?
+
+   *
+   **
+   ***
+   ****
+   *****
+ 
+   RPAD(string,len,char)
+
+   
+  BEGIN 
+     FOR i in 1..10
+   LOOP
+     dbms_output.put_line(rpad('*',i,'*'));
+   END LOOP;
+  END;
+   /
+
+ => write a prog to input string and check whether it is palindrome
+    or not ?
+
+    input :-  madam
+    output :- palindrome
+
+    DECLARE
+      s  VARCHAR2(20);
+      b  NUMBER(2);
+      r  VARCHAR2(20);
+    BEGIN 
+      s := '&string';   
+      b := LENGTH(s);
+      FOR i in 1..b
+    LOOP 
+       r := r||substr(s,-i,1);
+    END LOOP;
+    IF r=s THEN
+       dbms_output.put_line('palindrome');
+    ELSE
+      dbms_output.put_line('not a palindrome');
+    END IF;
+  END;
+  /
+
+ CURSORS :- 
+ ----------
+
+ => cursors are used to access row-by-row into pl/sql program.
+
+ => from pl/sql program if we submit a query to oracle , it goes
+    to db and gets the data and copies that data into temporary
+    memory and using cursor we can give name to that memory
+    and access row-by-row into pl/sql program and process the row.
+
+ => follow below steps to use cursor in pl/sql program
+
+   1  declare cursor
+   2  open cursor
+   3  fetch record from cursor
+   4  close cursor
+
+ Declaring cursor :- 
+ -------------------
+
+ syntax :-   CURSOR <NAME> IS SELECT STATEMENT ;
+
+ example :-  CURSOR C1 IS SELECT ename,sal FROM emp ;
+
+ Opening cursor :- 
+ -----------------
+
+      syntax :-  OPEN <cursor-name> ;
+      example :-  OPEN C1 ;
+
+ 1  select statement submitted to oracle.
+
+ 2  oracle executes the query and data returned by query 
+    is copied to temporary memory.
+
+ 3 cursor c1 points to that temporary memory.
+
+ fetching records from cursor :- 
+ -------------------------------
+
+ => "fetch" statement is used to fetch record from cursor.
+
+  syn :- FETCH <cursor-name> INTO <variables> ;
+
+  ex :-  FETCH C1 INTO a,b ;
+
+ => a fetch stmt fetches one row at a time but to process multiple rows
+    fetch stmt should be executed multiple times, so fetch stmt should
+    be inside a loop.
+ 
+ closing cursor :- 
+ ------------------
+
+  syn :- close <cursor-name>;
+
+  ex :-  close c1 ;
+
+28-jul-22
+
+ cursor attributes :- 
+ -------------------
+
+ 1  %FOUND :- 
+ -----------
+
+    TRUE     => if fetch successful
+    FALSE    => if fetch unsuccessful
+
+2  %NOTFOUND :- 
+--------------
+
+     TRUE     => if fetch unsuccessful
+     FALSE    => if fetch successful
+
+3  %ROWCOUNT :- 
+ ---------------
+
+ => returns no of rows fetched successfully
+
+4 %ISOPEN :- 
+------------
+
+  TRUE     => if cursor is open
+  FALSE    => if cursor is not open
+
+c1%found
+c1%notfound
+c1%rowcount
+c1%isopen
+
+example 1 :- 
+
+=> write a prog to print all employee names and salaries ?
+
+  DECLARE
+   cursor c1 is select ename,sal from emp;
+   vename varchar2(10);
+   vsal   number(7,2);
+ BEGIN
+    open c1;
+ loop
+    fetch c1 into vename,vsal;
+    exit when c1%notfound;
+    dbms_output.put_line(vename||'  '||vsal);
+ end loop;
+    close c1; 
+ END;
+  /
+
+ using while loop :- 
+ -------------------
+
+ DECLARE
+   cursor c1 is select ename,sal from emp;
+   vename varchar2(10);
+   vsal   number(7,2);
+ BEGIN
+    open c1;
+    fetch c1 into vename,vsal;
+    while(c1%found)
+ loop
+    dbms_output.put_line(vename||'  '||vsal);
+    fetch c1 into vename,vsal;
+ end loop;
+    close c1; 
+ END;
+  /
+
+ for loop cursor :- 
+ -------------------
+
+ for <var> in <cursor-name>
+loop
+  statements;
+end loop;
+
+ ex :- 
+
+ for r in c1
+loop 
+  statements;
+end loop;
+
+=> Adv of for loop cursor is opening cursor,fetching records from cursor
+   and closing cursor is not required and all these operations performed
+   implicitly.
+
+=> every time for loop executes a record is fetched from cursor and
+   assigned to  loop variable "r".
+
+ => loop variable "r" is declared implicitly as rowtype.
+
+  DECLARE
+   cursor c1 is select ename,sal from emp;
+  BEGIN
+    for r in c1
+  loop
+    dbms_output.put_line(r.ename||'   '||r.sal);
+  end loop; 
+ END;
+   /
+
+ =>  write a prog to calculate all the students total,avg,result
+     and insert into result table ?
+
+ STUDENTS
+ sno  sname  s1   s2   s3
+ 1    A      80   90   70
+ 2    B      60   50   40
+ 3    C      30   50   60
+
+ RESULT
+ sno  stot   savg   sres
+
+ DECLARE
+   cursor c1 is select sno,s1,s2,s3 from students;
+   vtot  number(3);
+   vavg  number(5,2);
+   vres  char(4);
+ BEGIN
+   for s in c1 
+ loop
+   vtot := s.s1 + s.s2 + s.s3;
+   vavg := vtot/3;
+   if s.s1>=35 and s.s2>=35 and s.s3>=35 then
+       vres := 'pass';
+   else
+      vres := 'fail';
+   end if;
+   INSERT INTO result VALUES(s.sno,vtot,vavg,vres);
+ end loop;
+   commit; 
+END;
+ /
+
+=> write a prog to calculate total sal without using SUM function ?
+
+   DECLARE
+    cursor c1 is select sal from emp;
+    t  number := 0;
+   BEGIN
+     for r in c1
+   loop
+      t := t + r.sal;
+   end loop;
+   dbms_output.put_line('Total Salary = '||t);
+   end;
+    /
+
+29-jul-22
+
+=> write a prog to print maximum salary without using max function ?
+
+  DECLARE
+    cursor c1 is select sal from emp;
+    t  number := 0;
+   BEGIN
+     for r in c1
+   loop
+      if r.sal > t then
+         t := r.sal;
+      end if;
+   end loop;
+   dbms_output.put_line('Maximum Salary = '||t);
+   end;
+    /
+
+ => write a prog to print mininum salary ?
+
+ c1
+ 3000
+ 2000
+ 5000
+ 1000
+ 4000
+ 
+   DECLARE
+    cursor c1 is select sal from emp;
+    t number ;
+    vsal number;
+   BEGIN
+      open c1;
+      fetch c1 into t;
+    loop
+      fetch c1 into vsal;
+      exit when c1%notfound;
+      if vsal<t then
+         t := vsal;
+      end if;
+   end loop;
+      close c1;
+      dbms_output.put_line('Mininum Salary = '||t);
+  END;
+   /
+
+
+ DECLARE
+    cursor c1 is select sal from emp;
+    t number ;
+    vsal number;
+   BEGIN
+      open c1;
+      fetch c1 into t;
+      close c1;
+      for r in c1
+     loop
+        if r.sal<t then
+          t := r.sal;
+        end if;
+       end loop;
+     dbms_output.put_line('Mininum Salary = '||t);
+  END;
+
+=> write a prog to increment employee salaries based on the pct in
+   raise_salary table ?
+
+ RAISE_SALARY
+ empno   pct
+ 7369    15
+ 7499    20
+ 7521    10
+ 7566    20
+ 7654    15 
+
+ DECLARE
+   cursor c1 is select empno,pct from raise_salary;
+ BEGIN
+  for r in c1
+ loop
+    update emp set sal = sal + (sal*r.pct/100) where empno=r.empno;
+ end loop;
+   commit;
+ END;
+ /
+
+=> write a prog to print names as follows ?
+
+    SMITH,ALLEN,WARD,JONES,-----------
+
+   DECLARE
+     cursor c1 is select ename from emp;
+     s  varchar2(1000);
+  BEGIN
+     for r in c1
+   loop
+      s := s||r.ename||',';
+   end loop;
+   dbms_output.put_line(RTRIM(s,','));
+  END;
+   /
+
+ =======================================================================
+
+ ERROR HANDLING / EXCEPTION HANDLING :- 
+ --------------------------------------
+
+ 1 syntax errors
+ 2 logical errors
+ 3 runtime errors 
+
+ => errors that are raised during program execution are called 
+    runtime errors and these runtime errors are called exceptions.
+
+    ex :-      x  number(3);
+
+               x :=- &x  => 10000   =>  runtime error
+
+ => if any statement causes runtime error then program execution is
+    terminated and oracle displays error message.
+
+ => to continue program execution and to replace system generated
+    message with our own simple and user friendly message then
+    we need to handle that runtime error.
+
+ => to handle runtime error in pl/sql program include a block called
+    EXCEPTION block.
+
+     DECLARE
+        declaration-part;
+     BEGIN
+       execution-part;    =>  statements causes exception
+     EXCEPTION
+       errorhandling-part; => statements handles exception
+     END;
+      /
+
+30-jul-22
+ 
+    EXCEPTION
+        when ex1 then
+             statements;
+        when ex2 then
+             statements;
+        ----------
+        when others then
+             statements;
+    END;
+     /
+
+ => exceptions are 2 types 
+
+   1  system defined
+   2  user defined
+
+  system defined :- 
+  ------------------
+
+  => errors raised by oracle are called system defined errors 
+
+  1 ZERO_DIVIDE :- 
+  ----------------
+
+  => raises when we try to divide a number with 0 
+
+          a := &a;   => 10
+          b := &b;   => 0
+          c := a/b;  => ZERO_DIVIDE error
+
+ 2  VALUE_ERROR :- 
+ -----------------
+
+  => raised if variable size or datatype mismatches
+
+    1     a   NUMBER(3);
+ 
+          a := &a;  => 10000  => VALUE_ERROR
+
+    2    a   NUMBER(3);
+
+         a := &a ;   => 'abc'  => VALUE_ERROR
+
+ 3  INVALID_NUMBER :- 
+ --------------------
+
+ => raised when we perform invalid arithmetic calculation
+
+           d  DATE;
+
+           d := '30-JUL-22' + 100  => INVALID_NUMBER
+  
+     NUMBER + NUMBER => VALID
+     DATE  +  NUMBER => VALID
+     STRING + NUMBER => INVALID
+
+  4 NO_DATA_FOUND :- 
+  -------------------
+
+  => raised when data not found in the table.
+
+           veno := &empno;  9999
+
+           SELECT sal INTO vsal 
+           FROM emp 
+           WHERE empno = veno; =>  no_data_found
+
+ 5  TOO_MANY_ROWS :- 
+ -------------------
+
+ =>  raised when select stmt fetches more than one row.
+
+          vdno := &deptno; => 20 
+
+        SELECT ename INTO vename 
+        FROM emp
+        WHERE deptno = vdno ; => TOO_MANY_ROWS 
+ 
+ 6  DUP_VAL_ON_INDEX :- 
+ ----------------------
+
+  => raised if we try to insert duplicate value into primary key column
+
+     create table x(x number(2) primary key);
+
+     insert into x values(10);
+
+     insert into x values(10);  => DUP_VAL_ON_INDEX
+     
+  example :- 
+
+   DECLARE
+      a  NUMBER(3);
+      b  NUMBER(3);
+      c  NUMBER(3);
+  BEGIN
+      a := &a;  
+      b := &b; 
+      c := a/b;
+      dbms_output.put_line(c);
+  EXCEPTION
+     when zero_divide then
+         dbms_output.put_line('divisor cannot be zero');
+    when value_error then
+        dbms_output.put_line('value exceeding size');
+  END;
+   /
+    
+ testing :- 
+
+ 1
+
+  a := 10
+  b := 0
+
+  output :-  divisor cannot be zero
+ 
+2  
+   a := 10;
+   b := 2222222222;
+
+  output :- value exceeding size
+
+ => write a prog to input empno and print name & salary ?
+
+    DECLARE
+      veno  NUMBER(4);
+      vename VARCHAR2(10);
+      vsal   NUMBER(7,2);
+   BEGIN
+      veno := &empno;   
+      SELECT ename,sal INTO vename,vsal FROM emp WHERE empno=veno;
+      dbms_output.put_line(vename||' '||vsal);
+   EXCEPTION
+      when no_data_found then
+          dbms_output.put_line('invalid empno');
+      when value_error then
+          dbms_output.put_line('value exceeding size');
+   END;
+     /
+
+ testing :- 
+
+ input     empno :-  9999
+
+ output    invalid empno 
+
+ SQLCODE,SQLERRM :- 
+ ------------------
+
+ => used in error handling
+
+   SQLCODE  => returns error code 
+   SQLERRM  => returns error message
+
+  user defined exceptions :- 
+  --------------------------
+
+  => a user can also raise his own exceptions called user define 
+     exception.
+
+  => when predefine error is not meeting our requirements then
+     we raise our own exception called user define exception.
+
+  => user define exceptions raised by user by using
+
+     1 RAISE statement
+     2 RAISE_APPLICATION_ERROR
+
+ using RAISE statement :- 
+ ------------------------
+
+        RAISE  <exception-name>;
+
+     ex :-  RAISE abc ; 
+
+  => exception "abc" must be declared in declaration part
+
+         abc  EXCEPTION ;
+
+ Example :-
+
+  DECLARE
+      a  NUMBER(3);
+      b  NUMBER(3);
+      c  NUMBER(3);
+      abc exception;
+  BEGIN
+      a := &a;  
+      b := &b; 
+      if b=1 then
+        raise abc;
+      end if;
+      c := a/b;
+      dbms_output.put_line(c);
+  EXCEPTION
+     when zero_divide then
+         dbms_output.put_line('divisor cannot be zero');
+    when value_error then
+        dbms_output.put_line('value exceeding size');
+    when abc then
+        dbms_output.put_line('divisor cannot be one');
+  END;
+   /
+
+01-aug-22
+ 
+using RAISE_APPLICATION_ERROR :- 
+---------------------------------
+
+     RAISE_APPLICATION_ERROR(error code,error msg);
+
+     error code   =>  -20001 to -20999
+                      
+ => diff b/w RAISE & RAISE_APPLICATION_ERROR  ?
+
+   1  in raise statement exception is raised by using name 
+      and in raise_application_error exception is raised by
+      using code.
+
+   2 use raise statement  to raise exception and to handle exception
+     and use raise_application_error  to raise exception and 
+     do not want to handle it.
+
+ example :- 
+
+  => write a prog to increment employee sal by specific amount 
+     and updates are not allowed on sunday ?
+
+     DECLARE
+       veno   NUMBER(4); 
+       vamt   NUMBER(4);
+     BEGIN
+       veno := &empno;
+       vamt := &amount;
+       IF TO_CHAR(sysdate,'dy')='sun'  THEN
+          RAISE_APPLICATION_ERROR(-20001,'sunday not allowed');
+       END IF;
+       UPDATE emp SET sal=sal+vamt WHERE empno=veno;
+       COMMIT;
+     END;
+       /
+
+ example 2 :- 
+
+  ACCOUNTS
+  ACCNO   ACTYPE  BAL
+  100     S       10000
+  101     S       20000
+
+  => write a prog for money transfer ?
+
+  DECLARE
+   vsacno  NUMBER(4);
+   vtacno  NUMBER(4);
+   vamt    NUMBER(5);
+   vbal    NUMBER(5);
+   cnt1    NUMBER(2);
+   cnt2    NUMBER(2);
+  BEGIN
+    vsacno := &sacno; 
+    vtacno := &tacno;
+    vamt   := &amount;
+    SELECT COUNT(*) INTO cnt1 FROM accounts WHERE accno=vsacno;
+    IF cnt1=0 THEN
+      RAISE_APPLICATION_ERROR(-20001,'source account does not exists');
+    END IF;
+    SELECT COUNT(*) INTO cnt2 FROM accounts WHERE accno=vtacno;
+    IF cnt2=0 THEN
+      RAISE_APPLICATION_ERROR(-20001,'target account does not exists');
+    END IF;
+    SELECT bal INTO vbal FROM accounts WHERE accno=vsacno;
+    IF vamt > vbal THEN
+       RAISE_APPLICATION_ERROR(-20001,'insufficient balance');
+    END IF;
+    UPDATE accounts SET bal=bal-vamt WHERE accno=vsacno;
+    UPDATE accounts SET bal=bal+vamt WHERE accno=vtacno;
+    COMMIT;
+  END;
+  /
+
+=========================================================================
+
+ Named PL/SQL blocks :- 
+ ----------------------
+
+ 1 procedures
+ 2 functions
+ 3 packages
+ 4 triggers 
+
+ sub-programs :- 
+ ----------------
+
+ 1 procedures
+ 2 functions 
+
+ Advantages :- 
+ -------------
+
+ 1  modular programming :- 
+ -------------------------
+
+ => with the help of procedures & functions a big pl/sql program can
+    be divided into small modules.
+
+ 2 reusability :- 
+ ----------------
+
+ => proc/func can be stored in db , so applications connected to db
+    can reuse procedures and functions.
+
+ 3  security :- 
+ -------------
+
+ => because these programs are stored in db so only authorized users
+    can execute these programs.
+
+ 4  invoked from front-end :- 
+  ---------------------------
+
+ => proc/func can be called from front-end applications like java,.net
+
+ 5  improves performance :- 
+ -------------------------
+
+ => procedures improves performance because they are precompiled
+    i.e. compiled and ready for execution. if we create a procedure
+    then program is compiled and stored in db and whenever we call
+    only execution is repeated but not compilation so this improves
+    performance.
+
+1
+
+  java appln----------> update-------------> oracle
+                                            
+                                     1 compile(parsing)
+                                          1 checks syntax
+                                          2 checks semantics
+                                              checks table exists or not
+                                              checks columns belongs to table or not
+                                              user has permissions to access table or not 
+                                     2 executed
+
+2
+
+  procedure :- 
+
+        update
+
+  compiled + stored in db 
+
+  java appln -----------proc-----------------oracle
+  
+                                             execute             
+
+ PROCEDURES :- 
+ -------------
+
+ => a procedure is a named PL/SQL block that accepts some input
+    performs some action on db and may or may not returns a value.
+
+ => procedures are created to perform one or more dml operations on db
+
+ => procedures are 2 types 
+
+   1 stand alone or stored procedures
+   2 packaged procedures 
+
+ 02-aug-22
+
+ standalone or stored procedures :- 
+ -----------------------------------
+
+ => these programs are called stored procedures because they are 
+    stored in db and they are called standalone because they are
+    stored as seperate object in db.
+
+  syntax :- 
+
+  CREATE OR REPLACE PROCEDURE <name>(parameters if any)
+  IS
+    <declaration-part>;
+  BEGIN
+     <execution-part>;
+  END;
+   /
+
+ parameters :- 
+ --------------
+
+ => we can declare parameters and we can pass values to parameters
+ => parameters are 3 types 
+
+  1 IN
+  2 OUT
+  3 IN OUT
+
+ IN :- 
+ -----
+
+ => always receives value
+ => default
+ => read only 
+
+ OUT :- 
+ -----
+
+ => always sends value
+ => write only 
+
+ IN OUT :- 
+ ----------
+
+ => receives and sends value
+ => read & write
+
+ example 1 :- procedure without parameters
+
+ => create a procedure to increment all the employee salaries by 1000 ?
+
+   CREATE OR REPLACE PROCEDURE raise_salary
+   IS
+   BEGIN
+     UPDATE emp SET sal = sal + 1000;
+     COMMIT;
+  END;
+   /
+
+ procedure created ( compiled + stored in db)
+
+ execution :- 
+ -------------
+
+  EXECUTE procname(parameters);
+
+  ex :-  EXECUTE  raise_salary ;
+ 
+ example 2 :- (procedure with IN prameters)
+
+       parametername   type   datatype
+
+ => create procedure to increment specific employee sal by specific amt ?
+
+   CREATE OR REPLACE PROCEDURE raise_salary
+   (
+     peno IN  NUMBER,
+     pamt IN  NUMBER
+   )
+   IS
+   BEGIN
+      UPDATE emp SET sal=sal+pamt WHERE empno = peno;
+      COMMIT;
+  END;
+   /
+
+Execution :- 
+------------
+
+   EXECUTE raise_salary ;  => ERROR
+
+   EXECUTE raise_salary(7499,1000);    positional association
+ 
+   EXECUTE raise_salary(peno=>7499,pamt=>1000);   named association
+
+   EXECUTE raise_salary(pamt=>1000,peno=>7499);   named association
+
+ note :- named association is convenient than positional association
+ because in named association we can pass values to parameters in any
+ order.
+
+ example 3 :- ( procedure with out parameter )
+
+ => create procedure to increment specific employee sal by specific amt
+    after increment send the updated sal to calling program ?
+
+  CREATE OR REPLACE PROCEDURE raise_salary
+  (
+     peno IN NUMBER,
+     pamt IN  NUMBER,
+     psal OUT NUMBER
+   )
+  IS
+  BEGIN
+    UPDATE emp SET sal=sal+pamt WHERE empno=peno;
+    COMMIT;
+    SELECT sal INTO psal FROM emp WHERE empno=peno;
+  END;
+   /
+
+EXECUTION :- 
+
+ SQL>VARIABLE K NUMBER;
+ SQL>EXECUTE raise_salary(7499,1000,:K);
+ SQL>PRINT :K
+
+example 4 :- 
+
+ACCOUNTS
+ACCNO   ACTYPE   BAL
+100     S        10000
+101     S        20000
+
+=> create a procedure for money withdrawl and after withdrawl send the
+   updated balance to calling program ?
+
+ 
+example 5 :- create procedure for money deposit ?
+
+
+example 6 :- create procedure for money transfer ?
+
+example 7 :- 
+
+CREATE TABLE emp77
+(
+  empno NUMBER(4) PRIMARY KEY,
+  ename VARCHAR2(10) NOT NULL,
+  sal   NUMBER(7,2) CHECK (sal>=3000)
+ );
+
+create procedure to insert data into emp77 table , while inserting
+if any exception raises send the error message to calling program ?
+
+ CREATE OR REPLACE PROCEDURE insert_emp77
+ (
+   peno IN NUMBER,
+   pname IN VARCHAR2,
+   psal  IN NUMBER,
+   pmsg  OUT VARCHAR2
+ )
+ IS
+ BEGIN
+    INSERT INTO emp77 VALUES(peno,pname,psal);
+    COMMIT;
+    pmsg := 'record inserted successfully';
+ EXCEPTION
+    when others then
+       pmsg := SQLERRM;
+ END;
+  /
+
+EXECUTION :-
+
+ sql>VARIABLE S VARCHAR2(100)
+
+ SQL>EXECUTE insert_emp77(100,'A',5000,:S);
+
+ SQL>PRINT :S
+
+USER DEFINE FUNCTIONS :- 
+-------------------------
+ 
+=> functions created by user are called user define functions.
+
+=> when predefine functions not meeting our requirements then we 
+   create our own functions called user define functions.
+
+=> a function is also a named PL/SQL block that accepts some input
+   performs some calculation and must return a value.
+
+=> functions are created 
+
+   1 for calculations
+   2 to fetch value from db 
+
+ syntax :- 
+
+  CREATE OR REPLACE 
+           FUNCTION <name>(parameters if any) RETURN <type>
+  IS
+    <declaration-part>;
+  BEGIN 
+     statements;
+     RETURN <expr>;
+  END;
+  /
+
+example 1 :- 
+
+=> create a function to add two numbers ?
+
+  CREATE OR REPLACE 
+      FUNCTION addnum(a  NUMBER,b NUMBER) RETURN NUMBER
+  IS
+  BEGIN
+      RETURN(a+b);
+  END;
+   /
+
+
+execution :- 
+
+1 sql commands like select,insert,update,delete
+2 another pl/sql program
+3 front-end applications 
+
+executing from sql commands :-
+----------------------------
+
+ SELECT addnum(10,20) FROM DUAL ; 
+
+
+
+
+
+ 
+
+
+
+
+ 
+ 
+
+
+
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
